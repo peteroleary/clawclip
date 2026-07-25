@@ -1,0 +1,11 @@
+{
+  "name": "clawclip-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unified platform for managing and visualizing an AI company with human employees alongside AI agents",
+  "scripts": {
+    "dev": "pnpm --filter @paperclipai/server dev",
+    "build": "pnpm --filter paperclip build",
+    "test": "pnpm --filter paperclip test"
+  }
+}
