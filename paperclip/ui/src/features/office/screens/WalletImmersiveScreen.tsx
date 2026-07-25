@@ -1,5 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { X, Wallet, DollarSign, TrendingUp, CreditCard, ArrowUpRight, ArrowDownRight, Plus, Receipt, Landmark, ShieldCheck } from "lucide-react";
+import { X, Wallet, DollarSign, TrendingUp, TrendingDown, CreditCard, ArrowUpRight, ArrowDownRight, Plus, Receipt, Landmark, ShieldCheck, Activity, Target } from "lucide-react";
+
+export interface FinancialMetric {
+  id: string;
+  label: string;
+  value: number;
+  format: "currency" | "months" | "percentage" | "raw";
+  trend?: number; // percentage e.g., 5 for +5%, -2 for -2%
+  trendLabel?: string;
+  icon?: React.ReactNode;
+}
+
+export interface TagBudget {
+  id: string;
+  tag: string; // e.g., "#engineering", "#marketing"
+  allocated: number;
+  spent: number;
+  provider?: string;
+  externalId?: string;
+}
 
 interface WalletImmersiveScreenProps {
   isOpen: boolean;
@@ -10,7 +29,7 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<"treasury" | "ledger" | "cards" | "crypto" | "ach">("treasury");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "ledger" | "cards" | "crypto" | "ach">("dashboard");
 
   // Modals State
   const [showCardModal, setShowCardModal] = useState(false);
@@ -47,10 +66,29 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
     { id: "a1", name: "Silicon Valley Bank Checking", bank: "SVB", last4: "8821", routing: "121000358", status: "Verified" },
   ]);
 
+  // Financial Dashboard Mock Data
+  const [metrics] = useState<FinancialMetric[]>([
+    { id: "m1", label: "Monthly Recurring Revenue", value: 125000, format: "currency", trend: 12.5, trendLabel: "vs last month", icon: <TrendingUp className="w-5 h-5 text-emerald-400" /> },
+    { id: "m2", label: "Total Expenses (MTD)", value: 85400, format: "currency", trend: -2.4, trendLabel: "vs last month", icon: <TrendingDown className="w-5 h-5 text-rose-400" /> },
+    { id: "m3", label: "Net Profit", value: 39600, format: "currency", trend: 8.1, trendLabel: "vs last month", icon: <DollarSign className="w-5 h-5 text-indigo-400" /> },
+    { id: "m4", label: "Current Runway", value: 18, format: "months", trend: 0, trendLabel: "stable", icon: <Activity className="w-5 h-5 text-cyan-400" /> },
+    { id: "m5", label: "Monthly Burn Rate", value: 45000, format: "currency", trend: 5.2, trendLabel: "vs last month", icon: <Landmark className="w-5 h-5 text-amber-400" /> },
+    { id: "m6", label: "Customer Acquisition Cost", value: 450, format: "currency", trend: -15.0, trendLabel: "vs last month", icon: <Target className="w-5 h-5 text-purple-400" /> },
+  ]);
+
+  const [tagBudgets] = useState<TagBudget[]>([
+    { id: "b1", tag: "#engineering", allocated: 50000, spent: 42000, provider: "ramp", externalId: "bgt_1928" },
+    { id: "b2", tag: "#marketing", allocated: 20000, spent: 18500, provider: "stripe", externalId: "bgt_4210" },
+    { id: "b3", tag: "#project-clawclip", allocated: 15000, spent: 16500, provider: "ramp", externalId: "bgt_1092" },
+    { id: "b4", tag: "#ai-swarms", allocated: 5000, spent: 1200, provider: "internal", externalId: "bgt_local" },
+    { id: "b5", tag: "#sales", allocated: 25000, spent: 8000, provider: "brex", externalId: "bgt_8821" },
+  ]);
+
   const [ledger] = useState([
-    { id: "t1", desc: "Anthropic Claude 3.5 Sonnet API Spend", amount: "-$42.50", date: "Today, 11:20 AM", category: "LLM Tokens", type: "expense" },
-    { id: "t2", desc: "OpenAI GPT-4o Token Consumption", amount: "-$28.10", date: "Yesterday, 04:15 PM", category: "LLM Tokens", type: "expense" },
-    { id: "t3", desc: "Company Treasury Deposit", amount: "+$5,000.00", date: "Jul 20, 2026", category: "Deposit", type: "income" },
+    { id: "t1", desc: "Anthropic Claude 3.5 Sonnet API Spend", amount: "-$42.50", date: "Today, 11:20 AM", category: "LLM Tokens", type: "expense", tag: "#ai-swarms" },
+    { id: "t2", desc: "OpenAI GPT-4o Token Consumption", amount: "-$28.10", date: "Yesterday, 04:15 PM", category: "LLM Tokens", type: "expense", tag: "#ai-swarms" },
+    { id: "t3", desc: "Vercel Enterprise Hosting", amount: "-$1,200.00", date: "Jul 21, 2026", category: "Infrastructure", type: "expense", tag: "#engineering" },
+    { id: "t4", desc: "Company Treasury Deposit", amount: "+$50,000.00", date: "Jul 20, 2026", category: "Deposit", type: "income", tag: "#funding" },
   ]);
 
   useEffect(() => {
@@ -149,12 +187,12 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
             {/* Tabs */}
             <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-semibold space-x-1">
               <button
-                onClick={() => setActiveTab("treasury")}
+                onClick={() => setActiveTab("dashboard")}
                 className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "treasury" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
+                  activeTab === "dashboard" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
                 }`}
               >
-                Treasury
+                Dashboard
               </button>
               <button
                 onClick={() => setActiveTab("ledger")}
@@ -202,27 +240,84 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
 
         {/* Content Body */}
         <div className="flex-1 p-6 overflow-y-auto">
-          {activeTab === "treasury" && (
-            <div className="space-y-6 max-w-4xl mx-auto">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-1">
-                  <span className="text-xs text-slate-400 font-medium">Total Treasury Balance</span>
-                  <div className="text-2xl font-bold text-emerald-400 font-mono">$14,290.40</div>
-                  <span className="text-[10px] text-emerald-400 flex items-center gap-1"><TrendingUp className="w-3 h-3" /> +12.4% this month</span>
-                </div>
-
-                <div className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-1">
-                  <span className="text-xs text-slate-400 font-medium">Monthly LLM Budget</span>
-                  <div className="text-2xl font-bold text-amber-400 font-mono">$1,500.00</div>
-                  <span className="text-[10px] text-slate-500">$70.60 spent so far</span>
-                </div>
-
-                <div className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-1">
-                  <span className="text-xs text-slate-400 font-medium">Active Agent Credits</span>
-                  <div className="text-2xl font-bold text-cyan-400 font-mono">$500.00</div>
-                  <span className="text-[10px] text-cyan-300">Swarm auto-refill active</span>
+          {activeTab === "dashboard" && (
+            <div className="space-y-8 max-w-5xl mx-auto">
+              
+              {/* Key Metrics Grid */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold text-slate-200 border-b border-slate-800 pb-2">Financial Overview</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {metrics.map(m => (
+                    <div key={m.id} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between space-y-2">
+                      <div className="flex justify-between items-start">
+                        <span className="text-xs text-slate-400 font-medium">{m.label}</span>
+                        {m.icon}
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-white font-mono">
+                          {m.format === "currency" ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(m.value) : m.format === "percentage" ? `${m.value}%` : m.format === "months" ? `${m.value} mos` : m.value}
+                        </div>
+                        {m.trend !== undefined && m.trendLabel && (
+                          <div className={`text-[10px] flex items-center gap-1 mt-1 font-medium ${m.trend > 0 ? "text-emerald-400" : m.trend < 0 ? "text-rose-400" : "text-slate-500"}`}>
+                            {m.trend > 0 ? <TrendingUp className="w-3 h-3" /> : m.trend < 0 ? <TrendingDown className="w-3 h-3" /> : null}
+                            {m.trend > 0 ? "+" : ""}{m.trend}% {m.trendLabel}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
+
+              {/* Tag-based Budgets */}
+              <div className="space-y-3">
+                <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                  <h3 className="text-sm font-bold text-slate-200">Budget Allocations</h3>
+                  <button className="text-xs text-amber-400 hover:text-amber-300 font-bold transition flex items-center gap-1">
+                    <Plus className="w-3 h-3" /> Allocate Funds
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {tagBudgets.map(b => {
+                    const pct = (b.spent / b.allocated) * 100;
+                    const isOver = pct >= 100;
+                    const isWarning = pct >= 85 && !isOver;
+                    
+                    const barColor = isOver ? "bg-rose-500" : isWarning ? "bg-amber-500" : "bg-emerald-500";
+                    const textColor = isOver ? "text-rose-400" : isWarning ? "text-amber-400" : "text-emerald-400";
+                    const borderColor = isOver ? "border-rose-500/30" : isWarning ? "border-amber-500/30" : "border-emerald-500/30";
+
+                    return (
+                      <div key={b.id} className={`bg-slate-950 border ${borderColor} p-5 rounded-2xl space-y-4 hover:bg-slate-900/50 transition`}>
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-1 bg-slate-900 rounded-lg text-xs font-mono font-bold text-slate-300 border border-slate-800">
+                              {b.tag}
+                            </span>
+                            {b.provider && (
+                              <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">{b.provider}</span>
+                            )}
+                          </div>
+                          <span className={`text-[10px] font-bold ${textColor}`}>
+                            {pct.toFixed(1)}% Utilized
+                          </span>
+                        </div>
+                        
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between text-xs font-mono">
+                            <span className="text-slate-400">Spent: <span className="text-white">${b.spent.toLocaleString()}</span></span>
+                            <span className="text-slate-500">of ${b.allocated.toLocaleString()}</span>
+                          </div>
+                          <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                            <div className={`h-full ${barColor} transition-all duration-500`} style={{ width: `${Math.min(pct, 100)}%` }} />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
             </div>
           )}
 
@@ -241,7 +336,10 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
                       {tx.type === "income" ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
                     </div>
                     <div>
-                      <h4 className="font-bold text-white text-sm">{tx.desc}</h4>
+                      <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                        {tx.desc}
+                        <span className="px-1.5 py-0.5 bg-slate-900 border border-slate-700 rounded text-[9px] font-mono text-slate-400">{tx.tag}</span>
+                      </h4>
                       <p className="text-xs text-slate-400">{tx.category} • {tx.date}</p>
                     </div>
                   </div>

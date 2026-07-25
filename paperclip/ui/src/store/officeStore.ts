@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { FacilityItem, initialFacilities } from "../features/office/screens/FacilitiesImmersiveScreen";
 
 export interface OfficeEntity {
   type: "project" | "human" | "agent" | "facility" | "task" | "goal";
@@ -9,6 +10,13 @@ export interface CameraTarget {
   x: number;
   y: number;
   z: number;
+}
+
+export interface LinkModalState {
+  isOpen: boolean;
+  sourceNodeId: string;
+  sourceNodeType: string;
+  sourceNodeName: string;
 }
 
 interface OfficeState {
@@ -34,6 +42,15 @@ interface OfficeState {
 
   cameraTarget: CameraTarget | null;
   setCameraTarget: (target: CameraTarget | null) => void;
+
+  // Global Linking State
+  linkModal: LinkModalState | null;
+  openLinkModal: (id: string, type: string, name: string) => void;
+  closeLinkModal: () => void;
+
+  // Facilities
+  activeFacility: FacilityItem | null;
+  setActiveFacility: (facility: FacilityItem) => void;
 }
 
 export const useOfficeStore = create<OfficeState>((set) => ({
@@ -70,4 +87,13 @@ export const useOfficeStore = create<OfficeState>((set) => ({
 
   cameraTarget: null,
   setCameraTarget: (target) => set({ cameraTarget: target }),
+
+  linkModal: null,
+  openLinkModal: (id, type, name) => 
+    set({ linkModal: { isOpen: true, sourceNodeId: id, sourceNodeType: type, sourceNodeName: name } }),
+  closeLinkModal: () => 
+    set({ linkModal: null }),
+
+  activeFacility: initialFacilities.find(f => f.isCurrentOffice) || initialFacilities[0],
+  setActiveFacility: (facility) => set({ activeFacility: facility }),
 }));

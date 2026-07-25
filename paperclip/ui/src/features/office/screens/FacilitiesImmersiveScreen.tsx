@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, Building2, Plus, LayoutGrid, Box, Move, CheckCircle2, Ruler, Sparkles, Layers, Sliders } from "lucide-react";
+import { useOfficeStore } from "../../../store/officeStore";
 
 interface FacilitiesImmersiveScreenProps {
   isOpen: boolean;
@@ -79,6 +80,9 @@ export const FacilitiesImmersiveScreen: React.FC<FacilitiesImmersiveScreenProps>
   isOpen,
   onClose,
 }) => {
+  const activeFacility = useOfficeStore((state) => state.activeFacility);
+  const setActiveFacility = useOfficeStore((state) => state.setActiveFacility);
+
   const [activeTab, setActiveTab] = useState<"facilities" | "floorplans" | "objects">("facilities");
   const [selectedFacility, setSelectedFacility] = useState<FacilityItem>(initialFacilities[0]);
 
@@ -233,8 +237,8 @@ export const FacilitiesImmersiveScreen: React.FC<FacilitiesImmersiveScreenProps>
           {activeTab === "facilities" && (
             <div className="space-y-4 max-w-6xl mx-auto">
               <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="font-bold text-slate-200 text-sm">21 Facility Presets & Scaled Layouts</h3>
-                <span className="text-xs text-slate-400">Current Office: <strong className="text-emerald-400">Classroom</strong></span>
+                <h3 className="font-bold text-slate-200 text-sm">{facilities.length} Facility Presets & Scaled Layouts</h3>
+                <span className="text-xs text-slate-400">Current Office: <strong className="text-emerald-400">{activeFacility?.name || "None"}</strong></span>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
@@ -243,7 +247,7 @@ export const FacilitiesImmersiveScreen: React.FC<FacilitiesImmersiveScreenProps>
                     key={fac.id}
                     onClick={() => setSelectedFacility(fac)}
                     className={`bg-slate-950 border p-5 rounded-2xl space-y-3 cursor-pointer transition shadow-lg ${
-                      fac.isCurrentOffice
+                      activeFacility?.id === fac.id
                         ? "border-emerald-500/80 bg-emerald-950/10 shadow-emerald-950/30"
                         : selectedFacility.id === fac.id
                         ? "border-amber-500/80 bg-amber-950/10"
@@ -255,7 +259,7 @@ export const FacilitiesImmersiveScreen: React.FC<FacilitiesImmersiveScreenProps>
                         <h4 className="font-bold text-white text-base">{fac.name}</h4>
                         <span className="text-xs text-amber-400 font-mono">{fac.type} Preset</span>
                       </div>
-                      {fac.isCurrentOffice && (
+                      {activeFacility?.id === fac.id && (
                         <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
                           Active Office
                         </span>
@@ -275,6 +279,20 @@ export const FacilitiesImmersiveScreen: React.FC<FacilitiesImmersiveScreenProps>
                         <span>Capacity:</span>
                         <span className="text-slate-200">{fac.capacity} Occupants</span>
                       </div>
+                      
+                      {activeFacility?.id !== fac.id && selectedFacility.id === fac.id && (
+                        <div className="pt-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveFacility(fac);
+                            }}
+                            className="w-full py-1.5 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 rounded-lg font-bold transition"
+                          >
+                            Set as Active Facility
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

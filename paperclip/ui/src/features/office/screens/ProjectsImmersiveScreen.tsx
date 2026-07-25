@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, FolderKanban, Plus, ExternalLink, CheckCircle2, Clock, Kanban, MessageSquare } from "lucide-react";
+import { X, FolderKanban, Plus, ExternalLink, CheckCircle2, Clock, Kanban, MessageSquare, Link2 } from "lucide-react";
 import type { Workforce3DMember } from "../types.js";
 import { useOfficeStore } from "../../../store/officeStore.js";
 
@@ -16,6 +16,7 @@ export const ProjectsImmersiveScreen: React.FC<ProjectsImmersiveScreenProps> = (
 }) => {
   const openEntityBoard = useOfficeStore((state) => state.openEntityBoard);
   const openEntityChat = useOfficeStore((state) => state.openEntityChat);
+  const openLinkModal = useOfficeStore((state) => state.openLinkModal);
 
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState("");
@@ -32,6 +33,8 @@ export const ProjectsImmersiveScreen: React.FC<ProjectsImmersiveScreenProps> = (
       progress: 85,
       tasks: "14 / 18 Completed",
       desc: "Merge Claw3D Three.js isometric canvas with Paperclip engine and full-screen immersive tools.",
+      budget: 150000,
+      spent: 125000,
     },
     {
       id: "p2",
@@ -40,6 +43,8 @@ export const ProjectsImmersiveScreen: React.FC<ProjectsImmersiveScreenProps> = (
       progress: 92,
       tasks: "8 / 9 Completed",
       desc: "Financial ledger station for managing model API token spend and company budgets.",
+      budget: 50000,
+      spent: 42000,
     },
   ]);
 
@@ -68,6 +73,8 @@ export const ProjectsImmersiveScreen: React.FC<ProjectsImmersiveScreenProps> = (
         progress: 0,
         tasks: "0 / 5 Completed",
         desc: desc || "New strategic initiative.",
+        budget: parseInt(budget, 10) || 0,
+        spent: 0,
       },
       ...projects,
     ]);
@@ -139,6 +146,12 @@ export const ProjectsImmersiveScreen: React.FC<ProjectsImmersiveScreenProps> = (
 
                   <div className="flex items-center space-x-2">
                     <button
+                      onClick={() => openLinkModal(proj.id, "project", proj.name)}
+                      className="px-3 py-1 bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
+                    >
+                      <Link2 className="w-3.5 h-3.5" /> Link
+                    </button>
+                    <button
                       onClick={() => openEntityBoard(proj.id === "p1" ? "proj_clawclip" : "proj_atm")}
                       className="px-3 py-1 bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/30 text-cyan-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
                     >
@@ -153,11 +166,26 @@ export const ProjectsImmersiveScreen: React.FC<ProjectsImmersiveScreenProps> = (
                   </div>
                 </div>
 
+                {/* Progress bar */}
                 <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
                   <div
                     className="bg-gradient-to-r from-blue-600 to-cyan-400 h-full rounded-full transition-all duration-500"
                     style={{ width: `${proj.progress}%` }}
                   />
+                </div>
+
+                {/* Financial Utilization */}
+                <div className="pt-2 border-t border-slate-800/50 mt-2 space-y-1">
+                  <div className="flex justify-between text-[10px] font-mono text-slate-400">
+                    <span>Budget Utilized: {proj.budget > 0 ? ((proj.spent / proj.budget) * 100).toFixed(1) : 0}%</span>
+                    <span><span className="text-white">${proj.spent.toLocaleString()}</span> / ${proj.budget.toLocaleString()}</span>
+                  </div>
+                  <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${proj.budget > 0 && (proj.spent / proj.budget) >= 0.85 ? (proj.spent >= proj.budget ? 'bg-rose-500' : 'bg-amber-500') : 'bg-emerald-500'}`}
+                      style={{ width: `${proj.budget > 0 ? Math.min((proj.spent / proj.budget) * 100, 100) : 0}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

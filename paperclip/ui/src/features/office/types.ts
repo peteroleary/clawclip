@@ -11,6 +11,8 @@ export interface Workforce3DMember {
   reportsTo?: string | null;
   hourlyCostCents?: number;
   monthlyCostCents?: number;
+  annualSalary?: number;
+  monthlyCost?: number;
   workingHours?: { start: string; end: string; timezone: string };
   skills: string[];
   deskPosition: {

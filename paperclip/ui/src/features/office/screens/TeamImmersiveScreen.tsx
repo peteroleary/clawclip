@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Users, User, Bot, Network, Layers, ShieldCheck, Plus, Move, DollarSign, Mail, Phone, Clock, Shield, Kanban, MessageSquare } from "lucide-react";
+import { X, Users, User, Bot, Network, Layers, ShieldCheck, Plus, Move, DollarSign, Mail, Phone, Clock, Shield, Kanban, MessageSquare, Link2 } from "lucide-react";
 import type { Workforce3DMember } from "../types.js";
 import { useOfficeStore } from "../../../store/officeStore.js";
 
@@ -16,6 +16,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
 }) => {
   const openEntityBoard = useOfficeStore((state) => state.openEntityBoard);
   const openEntityChat = useOfficeStore((state) => state.openEntityChat);
+  const openLinkModal = useOfficeStore((state) => state.openLinkModal);
 
   const [activeTab, setActiveTab] = useState<"org" | "departments" | "teams" | "swarms" | "troops" | "humans" | "agents">("org");
 
@@ -40,13 +41,14 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
   const [hSchedEnd, setHSchedEnd] = useState("17:00");
   const [hReportsTo, setHReportsTo] = useState("");
   const [hPayType, setHPayType] = useState("Salaried");
-  const [hPayAmount, setHPayAmount] = useState("120000");
+  const [hSalary, setHSalary] = useState("120000");
 
   // Agent Form State
   const [aName, setAName] = useState("");
   const [aRole, setARole] = useState("");
-  const [aModel, setAModel] = useState("Gemini 2.5 Flash");
+  const [aModel, setAModel] = useState("Claude 3.5 Sonnet");
   const [aPrompt, setAPrompt] = useState("");
+  const [aCost, setACost] = useState("500");
 
   // Dept Form State
   const [deptName, setDeptName] = useState("");
@@ -56,14 +58,17 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
   // Team Form State
   const [teamName, setTeamName] = useState("");
   const [teamLead, setTeamLead] = useState("");
+  const [teamBudget, setTeamBudget] = useState("500000");
 
   // Swarm Form State
   const [swarmName, setSwarmName] = useState("");
   const [swarmLead, setSwarmLead] = useState("");
+  const [swarmBudget, setSwarmBudget] = useState("100000");
 
   // Troop Form State
   const [troopName, setTroopName] = useState("");
   const [troopLead, setTroopLead] = useState("");
+  const [troopBudget, setTroopBudget] = useState("750000");
 
   // Org Link Form State
   const [orgManager, setOrgManager] = useState("");
@@ -83,6 +88,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
             department: "Executive",
             status: "active",
             skills: ["Leadership", "Product Vision"],
+            annualSalary: 250000,
             deskPosition: { x: 0, y: 0 },
             avatarConfig: {},
           },
@@ -95,6 +101,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
             department: "Engineering",
             status: "active",
             skills: ["Architecture", "React", "TypeScript"],
+            annualSalary: 185000,
             deskPosition: { x: 2, y: 0 },
             avatarConfig: {},
           },
@@ -107,6 +114,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
             department: "Swarm Ops",
             status: "working",
             skills: ["Refactoring", "Code Review"],
+            monthlyCost: 350,
             deskPosition: { x: -2, y: 0 },
             avatarConfig: {},
           },
@@ -119,6 +127,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
             department: "Swarm Ops",
             status: "working",
             skills: ["Orchestration", "Task Allocation"],
+            monthlyCost: 600,
             deskPosition: { x: -4, y: 0 },
             avatarConfig: {},
           },
@@ -126,21 +135,21 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
   );
 
   const [departments, setDepartments] = useState([
-    { name: "Executive & HQ", lead: "Alex Mercer", count: "3 Members", color: "border-purple-500/30 bg-purple-950/20" },
-    { name: "Engineering & Architecture", lead: "Sarah Chen", count: "8 Members", color: "border-cyan-500/30 bg-cyan-950/20" },
-    { name: "Autonomous Swarms & Ops", lead: "Hermes Manager", count: "12 Agents", color: "border-emerald-500/30 bg-emerald-950/20" },
+    { name: "Executive & HQ", lead: "Alex Mercer", count: "3 Members", color: "border-purple-500/30 bg-purple-950/20", budget: 1500000, spent: 450000 },
+    { name: "Engineering & Architecture", lead: "Sarah Chen", count: "8 Members", color: "border-cyan-500/30 bg-cyan-950/20", budget: 3500000, spent: 1200000 },
+    { name: "Autonomous Swarms & Ops", lead: "Hermes Manager", count: "12 Agents", color: "border-emerald-500/30 bg-emerald-950/20", budget: 800000, spent: 750000 },
   ]);
 
   const [teams, setTeams] = useState([
-    { name: "Core Product Squad", desc: "Builds web UI and 3D office platform features.", members: "4 Staff" },
+    { name: "Core Product Squad", desc: "Builds web UI and 3D office platform features.", members: "4 Staff", budget: 1200000, spent: 500000 },
   ]);
 
   const [swarms, setSwarms] = useState([
-    { name: "AI Swarm Alpha", desc: "Autonomous background agents handling code reviews and deployments.", members: "6 Agents" },
+    { name: "AI Swarm Alpha", desc: "Autonomous background agents handling code reviews and deployments.", members: "6 Agents", budget: 20000, spent: 18000 },
   ]);
 
   const [troops, setTroops] = useState([
-    { name: "Full-Stack Deployment Troop", desc: "Combined human engineers and agent automation swarms.", members: "4 Staff + 5 Agents" },
+    { name: "Full-Stack Deployment Troop", desc: "Combined human engineers and agent automation swarms.", members: "4 Staff + 5 Agents", budget: 500000, spent: 210000 },
   ]);
 
   useEffect(() => {
@@ -189,6 +198,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
       department: "Engineering",
       status: "active",
       reportsTo: hReportsTo || undefined,
+      annualSalary: parseInt(hSalary, 10) || 0,
       skills: ["Generalist"],
       deskPosition: { x: 1, y: 1 },
       avatarConfig: {},
@@ -212,6 +222,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
       type: "agent",
       department: "Swarm Ops",
       status: "working",
+      monthlyCost: parseInt(aCost, 10) || 0,
       skills: ["AI Automation"],
       deskPosition: { x: -1, y: 1 },
       avatarConfig: {},
@@ -377,10 +388,29 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                   const deptId = idx === 0 ? "exec" : idx === 1 ? "engineering" : "ai_swarm";
                   return (
                     <div key={idx} className={`border p-5 rounded-2xl space-y-3 ${dept.color}`}>
-                      <h4 className="font-bold text-slate-100 text-base">{dept.name}</h4>
+                      <h4 className="font-bold text-slate-100 text-base flex justify-between items-start">
+                        {dept.name}
+                        <span className="text-[10px] font-mono font-normal text-slate-400 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded-full">
+                          Budget: ${dept.budget.toLocaleString()}
+                        </span>
+                      </h4>
                       <p className="text-xs text-slate-400">Department Head: <strong className="text-slate-200">{dept.lead}</strong></p>
                       
-                      <div className="flex justify-between items-center pt-1 border-t border-slate-800/60">
+                      {/* Financial Utilization */}
+                      <div className="space-y-1 mt-2">
+                        <div className="flex justify-between text-[10px] font-mono text-slate-400">
+                          <span>Spent: <span className="text-white">${dept.spent.toLocaleString()}</span></span>
+                          <span>{((dept.spent / dept.budget) * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${(dept.spent / dept.budget) >= 0.85 ? ((dept.spent / dept.budget) >= 1 ? 'bg-rose-500' : 'bg-amber-500') : 'bg-emerald-500'}`}
+                            style={{ width: `${Math.min((dept.spent / dept.budget) * 100, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center pt-2 border-t border-slate-800/60 mt-3">
                         <span className="inline-block px-2.5 py-0.5 bg-slate-900 border border-slate-800 text-[10px] font-semibold rounded-xl text-slate-300">
                           {dept.count}
                         </span>
@@ -425,11 +455,26 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                 {teams.map((t, idx) => (
                   <div key={idx} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3">
                     <div>
-                      <h4 className="font-bold text-purple-300 text-base">{t.name}</h4>
+                      <h4 className="font-bold text-purple-300 text-base flex justify-between items-start">
+                        {t.name}
+                        <span className="text-[9px] font-mono font-normal text-slate-400 bg-slate-900 border border-slate-800 px-1.5 py-0.5 rounded-full">
+                          Bgt: ${(t.budget/1000).toFixed(0)}k
+                        </span>
+                      </h4>
                       <p className="text-xs text-slate-400">{t.desc}</p>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2 border-t border-slate-800">
+                    {/* Financial Utilization */}
+                    <div className="space-y-1">
+                      <div className="w-full bg-slate-900 rounded-full h-1 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${(t.spent / t.budget) >= 0.85 ? ((t.spent / t.budget) >= 1 ? 'bg-rose-500' : 'bg-amber-500') : 'bg-emerald-500'}`}
+                          style={{ width: `${Math.min((t.spent / t.budget) * 100, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2 border-t border-slate-800 mt-2">
                       <span className="inline-block px-2.5 py-0.5 bg-slate-900 text-xs font-mono text-purple-400 rounded-lg border border-purple-500/20">
                         {t.members}
                       </span>
@@ -471,11 +516,26 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                 {swarms.map((s, idx) => (
                   <div key={idx} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3">
                     <div>
-                      <h4 className="font-bold text-cyan-300 text-base">{s.name}</h4>
+                      <h4 className="font-bold text-cyan-300 text-base flex justify-between items-start">
+                        {s.name}
+                        <span className="text-[9px] font-mono font-normal text-slate-400 bg-slate-900 border border-slate-800 px-1.5 py-0.5 rounded-full">
+                          Bgt: ${(s.budget/1000).toFixed(0)}k
+                        </span>
+                      </h4>
                       <p className="text-xs text-slate-400">{s.desc}</p>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2 border-t border-slate-800">
+                    {/* Financial Utilization */}
+                    <div className="space-y-1">
+                      <div className="w-full bg-slate-900 rounded-full h-1 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${(s.spent / s.budget) >= 0.85 ? ((s.spent / s.budget) >= 1 ? 'bg-rose-500' : 'bg-amber-500') : 'bg-emerald-500'}`}
+                          style={{ width: `${Math.min((s.spent / s.budget) * 100, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2 border-t border-slate-800 mt-2">
                       <span className="inline-block px-2.5 py-0.5 bg-slate-900 text-xs font-mono text-cyan-400 rounded-lg border border-cyan-500/20">
                         {s.members}
                       </span>
@@ -517,11 +577,26 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                 {troops.map((tr, idx) => (
                   <div key={idx} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3">
                     <div>
-                      <h4 className="font-bold text-amber-300 text-base">{tr.name}</h4>
+                      <h4 className="font-bold text-amber-300 text-base flex justify-between items-start">
+                        {tr.name}
+                        <span className="text-[9px] font-mono font-normal text-slate-400 bg-slate-900 border border-slate-800 px-1.5 py-0.5 rounded-full">
+                          Bgt: ${(tr.budget/1000).toFixed(0)}k
+                        </span>
+                      </h4>
                       <p className="text-xs text-slate-400">{tr.desc}</p>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2 border-t border-slate-800">
+                    {/* Financial Utilization */}
+                    <div className="space-y-1">
+                      <div className="w-full bg-slate-900 rounded-full h-1 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${(tr.spent / tr.budget) >= 0.85 ? ((tr.spent / tr.budget) >= 1 ? 'bg-rose-500' : 'bg-amber-500') : 'bg-emerald-500'}`}
+                          style={{ width: `${Math.min((tr.spent / tr.budget) * 100, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2 border-t border-slate-800 mt-2">
                       <span className="inline-block px-2.5 py-0.5 bg-slate-900 text-xs font-mono text-amber-400 rounded-lg border border-amber-500/20">
                         {tr.members}
                       </span>
@@ -561,15 +636,31 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
 
               <div className="grid grid-cols-2 gap-4">
                 {humans.map((h) => (
-                  <div key={h.id} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center space-x-4">
-                    <div className="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-xl">
-                      👤
+                  <div key={h.id} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-xl">
+                        👤
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-white text-sm">{h.name}</h4>
+                        <p className="text-xs text-purple-300 font-semibold">{h.title || h.role}</p>
+                        <div className="flex gap-2 mt-1">
+                          <span className="text-[10px] text-slate-500 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">Human</span>
+                          {h.annualSalary !== undefined && (
+                            <span className="text-[10px] text-emerald-500/80 bg-emerald-950/20 px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">
+                              ${(h.annualSalary/1000).toFixed(0)}k / yr
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-white text-sm">{h.name}</h4>
-                      <p className="text-xs text-purple-300 font-semibold">{h.title || h.role}</p>
-                      <span className="text-[10px] text-slate-500">Human Employee</span>
-                    </div>
+                    
+                    <button
+                      onClick={() => openLinkModal(h.id, "human", h.name)}
+                      className="px-3 py-1.5 bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
+                    >
+                      <Link2 className="w-3.5 h-3.5" /> Link
+                    </button>
                   </div>
                 ))}
               </div>
@@ -590,15 +681,31 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
 
               <div className="grid grid-cols-2 gap-4">
                 {agents.map((a) => (
-                  <div key={a.id} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center space-x-4">
-                    <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 border border-cyan-500/40 flex items-center justify-center text-xl">
-                      🤖
+                  <div key={a.id} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 border border-cyan-500/40 flex items-center justify-center text-xl">
+                        🤖
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-white text-sm">{a.name}</h4>
+                        <p className="text-xs text-cyan-300 font-semibold">{a.role}</p>
+                        <div className="flex gap-2 mt-1">
+                          <span className="text-[10px] text-slate-500 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">AI Agent</span>
+                          {a.monthlyCost !== undefined && (
+                            <span className="text-[10px] text-emerald-500/80 bg-emerald-950/20 px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">
+                              ${a.monthlyCost} / mo
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-white text-sm">{a.name}</h4>
-                      <p className="text-xs text-cyan-300 font-semibold">{a.role}</p>
-                      <span className="text-[10px] text-slate-400 font-mono">Model: {a.title || "Gemini 2.5 Flash"}</span>
-                    </div>
+
+                    <button
+                      onClick={() => openLinkModal(a.id, "agent", a.name)}
+                      className="px-3 py-1.5 bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
+                    >
+                      <Link2 className="w-3.5 h-3.5" /> Link
+                    </button>
                   </div>
                 ))}
               </div>
@@ -754,11 +861,11 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-slate-300 mb-1 font-medium">Pay Amount ($)</label>
+                    <label className="block text-slate-300 mb-1 font-medium">Annual Salary ($)</label>
                     <input
                       type="number"
-                      value={hPayAmount}
-                      onChange={(e) => setHPayAmount(e.target.value)}
+                      value={hSalary}
+                      onChange={(e) => setHSalary(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-purple-500"
                     />
                   </div>
@@ -829,15 +936,26 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-slate-300 mb-1 font-medium">System Prompt Instructions</label>
-                  <textarea
-                    rows={3}
-                    placeholder="Provide system instructions for the agent..."
-                    value={aPrompt}
-                    onChange={(e) => setAPrompt(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-cyan-500"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-300 mb-1 font-medium">System Prompt Instructions</label>
+                    <textarea
+                      rows={2}
+                      placeholder="Provide system instructions for the agent..."
+                      value={aPrompt}
+                      onChange={(e) => setAPrompt(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-cyan-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 mb-1 font-medium">Est. API Cost ($/mo)</label>
+                    <input
+                      type="number"
+                      value={aCost}
+                      onChange={(e) => setACost(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-cyan-500"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex justify-end space-x-2 pt-2">

@@ -24,6 +24,7 @@ import { CommsImmersiveScreen } from "../features/office/screens/CommsImmersiveS
 import { TargetsImmersiveScreen } from "../features/office/screens/TargetsImmersiveScreen.js";
 import { DirectoryImmersiveScreen } from "../features/office/screens/DirectoryImmersiveScreen.js";
 import { FacilitiesImmersiveScreen } from "../features/office/screens/FacilitiesImmersiveScreen.js";
+import { GlobalLinkModal } from "../features/office/components/GlobalLinkModal.js";
 
 export const OfficePage: React.FC = () => {
   const { companyId } = useParams<{ companyId: string }>();
@@ -229,6 +230,9 @@ export const OfficePage: React.FC = () => {
         onClose={() => setActiveDrawer("bottom", null)}
         workforce={workforce}
       />
+
+      {/* 12. Global Link Modal */}
+      <GlobalLinkModal />
     </div>
   );
 };
