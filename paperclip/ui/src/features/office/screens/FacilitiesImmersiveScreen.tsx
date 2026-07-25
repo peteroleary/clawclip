@@ -28,7 +28,8 @@ export type FacilityTypePreset =
   | "Gym"
   | "Kitchen/Bakery"
   | "Boardroom"
-  | "Classroom";
+  | "Classroom"
+  | "Bank";
 
 export interface FacilityItem {
   id: string;
@@ -74,6 +75,7 @@ export const initialFacilities: FacilityItem[] = [
   { id: "f_gym", name: "Fitness & Training Gym", type: "Gym", widthMeters: 28, depthMeters: 20, scaleFactor: 1.3, capacity: 55, objectsCount: 35 },
   { id: "f_kitchen", name: "Commercial Bakery & Kitchen", type: "Kitchen/Bakery", widthMeters: 16, depthMeters: 12, scaleFactor: 0.8, capacity: 12, objectsCount: 19 },
   { id: "f_boardroom", name: "Executive Glass Boardroom", type: "Boardroom", widthMeters: 10, depthMeters: 8, scaleFactor: 0.6, capacity: 14, objectsCount: 10 },
+  { id: "f_bank", name: "Central City Bank Branch", type: "Bank", widthMeters: 22, depthMeters: 16, scaleFactor: 1.0, capacity: 30, objectsCount: 22 },
 ];
 
 export const FacilitiesImmersiveScreen: React.FC<FacilitiesImmersiveScreenProps> = ({

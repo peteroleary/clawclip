@@ -22,6 +22,7 @@ import { HospitalPreset } from "./presets/HospitalPreset";
 import { HousePreset } from "./presets/HousePreset";
 import { GymPreset } from "./presets/GymPreset";
 import { BoardroomPreset } from "./presets/BoardroomPreset";
+import { BankPreset } from "./presets/BankPreset";
 
 interface OfficeEnvironmentProps {
   onDeskClick?: (deskId: string) => void;
@@ -55,6 +56,7 @@ export const OfficeEnvironment: React.FC<OfficeEnvironmentProps> = ({ onDeskClic
       {type === "House" && <HousePreset />}
       {type === "Gym" && <GymPreset />}
       {type === "Boardroom" && <BoardroomPreset />}
+      {type === "Bank" && <BankPreset />}
 
       {/* Fallback if facility type is unknown or default */}
       {!type && <ClassroomPreset onDeskClick={onDeskClick} />}

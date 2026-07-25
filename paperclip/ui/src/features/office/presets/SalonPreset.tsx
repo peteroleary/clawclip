@@ -1,4 +1,5 @@
 import React from "react";
+import { SnakePlant, FernPlant } from "./DecorativePlants";
 
 export const SalonPreset: React.FC = () => {
   const stations = [-4, -1, 2, 5];
@@ -38,6 +39,10 @@ export const SalonPreset: React.FC = () => {
           </mesh>
         </group>
       ))}
+
+      {/* Decorative Plants */}
+      <FernPlant position={[-6, 0, -4]} />
+      <SnakePlant position={[6, 0, 4]} />
     </group>
   );
 };

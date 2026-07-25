@@ -1,4 +1,5 @@
 import React from "react";
+import { FernPlant, FicusPlant } from "./DecorativePlants";
 
 export const HousePreset: React.FC = () => {
   return (
@@ -33,6 +34,11 @@ export const HousePreset: React.FC = () => {
           <meshStandardMaterial color="#09090b" />
         </mesh>
       </group>
+
+      {/* Decorative Plants */}
+      <FernPlant position={[-8, 0, -6.5]} />
+      <FicusPlant position={[8, 0, -6.5]} />
+      <FicusPlant position={[-8, 0, 6.5]} />
     </group>
   );
 };

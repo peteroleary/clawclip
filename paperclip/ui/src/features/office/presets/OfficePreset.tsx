@@ -1,5 +1,6 @@
 import React from "react";
 import * as THREE from "three";
+import { FicusPlant, SnakePlant, FernPlant } from "./DecorativePlants";
 import { useOfficeStore } from "../../../store/officeStore";
 
 interface OfficePresetProps {
@@ -204,27 +205,10 @@ export const OfficePreset: React.FC<OfficePresetProps> = ({ onDeskClick }) => {
         </mesh>
       </group>
 
-      {/* Potted Plants */}
-      <group position={[-11, 0, -9]}>
-        <mesh position={[0, 0.3, 0]}>
-          <cylinderGeometry args={[0.3, 0.2, 0.6]} />
-          <meshStandardMaterial color="#475569" />
-        </mesh>
-        <mesh position={[0, 1.0, 0]}>
-          <sphereGeometry args={[0.6]} />
-          <meshStandardMaterial color="#15803d" roughness={0.8} />
-        </mesh>
-      </group>
-      <group position={[11, 0, 9]}>
-        <mesh position={[0, 0.3, 0]}>
-          <cylinderGeometry args={[0.3, 0.2, 0.6]} />
-          <meshStandardMaterial color="#475569" />
-        </mesh>
-        <mesh position={[0, 1.0, 0]}>
-          <sphereGeometry args={[0.6]} />
-          <meshStandardMaterial color="#15803d" roughness={0.8} />
-        </mesh>
-      </group>
+      {/* Decorative Plants */}
+      <FicusPlant position={[-11.5, 0, -9]} />
+      <SnakePlant position={[11.5, 0, 9]} />
+      <FernPlant position={[-11.5, 0, 9]} />
     </group>
   );
 };

@@ -1,4 +1,5 @@
 import React from "react";
+import { FicusPlant, FernPlant } from "./DecorativePlants";
 
 export const CallCenterPreset: React.FC = () => {
   // Dense cubicle grid
@@ -63,6 +64,12 @@ export const CallCenterPreset: React.FC = () => {
           </mesh>
         </group>
       ))}
+
+      {/* Decorative Plants */}
+      <FicusPlant position={[-16, 0, -11]} />
+      <FernPlant position={[16, 0, -11]} />
+      <FicusPlant position={[-16, 0, 11]} />
+      <FernPlant position={[16, 0, 11]} />
     </group>
   );
 };

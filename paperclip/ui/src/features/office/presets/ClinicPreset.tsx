@@ -1,4 +1,5 @@
 import React from "react";
+import { FicusPlant, SnakePlant } from "./DecorativePlants";
 
 export const ClinicPreset: React.FC = () => {
   return (
@@ -47,6 +48,10 @@ export const ClinicPreset: React.FC = () => {
           <meshStandardMaterial color="#06b6d4" />
         </mesh>
       </group>
+
+      {/* Decorative Plants */}
+      <SnakePlant position={[-10, 0, -7]} />
+      <FicusPlant position={[10, 0, -7]} />
     </group>
   );
 };

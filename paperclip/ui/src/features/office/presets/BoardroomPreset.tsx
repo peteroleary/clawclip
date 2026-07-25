@@ -1,4 +1,5 @@
 import React from "react";
+import { SnakePlant, FicusPlant } from "./DecorativePlants";
 
 export const BoardroomPreset: React.FC = () => {
   return (
@@ -36,6 +37,10 @@ export const BoardroomPreset: React.FC = () => {
           </React.Fragment>
         ))}
       </group>
+
+      {/* Decorative Plants */}
+      <SnakePlant position={[-4, 0, -3]} />
+      <FicusPlant position={[4, 0, -3]} />
     </group>
   );
 };
