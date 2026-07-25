@@ -142,6 +142,7 @@ export const OfficePage: React.FC = () => {
         onOpenBoard={() => setActiveDrawer("bottom", "board")}
         onOpenScheduling={() => setActiveDrawer("bottom", "scheduling")}
         onOpenFacilities={() => setActiveDrawer("bottom", "facilities")}
+        onOpenDiscover={() => setActiveDrawer("bottom", "discover")}
         onOpenDirectory={() => setActiveDrawer("bottom", "directory")}
         onOpenMemory={() => setActiveDrawer("bottom", "memory")}
         onOpenArtifacts={() => setActiveDrawer("bottom", "artifacts")}
@@ -194,6 +195,12 @@ export const OfficePage: React.FC = () => {
       {/* 7. Full-Screen Immersive Facilities & Spatial Screen */}
       <FacilitiesImmersiveScreen
         isOpen={activePanels.bottom === "facilities"}
+        onClose={() => setActiveDrawer("bottom", null)}
+      />
+
+      {/* 7.5 Full-Screen Immersive Discover Screen */}
+      <DiscoverImmersiveScreen
+        isOpen={activePanels.bottom === "discover"}
         onClose={() => setActiveDrawer("bottom", null)}
       />
 

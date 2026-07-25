@@ -10,7 +10,7 @@ export const DiscoverImmersiveScreen: React.FC<DiscoverImmersiveScreenProps> = (
   isOpen,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<"skills" | "mcps" | "tools" | "workflows" | "connectors">("skills");
+  const [activeTab, setActiveTab] = useState<"skills" | "mcps" | "tools" | "workflows" | "connectors" | "templates">("skills");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Modals state
@@ -161,6 +161,14 @@ export const DiscoverImmersiveScreen: React.FC<DiscoverImmersiveScreenProps> = (
               >
                 Workflows
               </button>
+              <button
+                onClick={() => setActiveTab("templates")}
+                className={`px-3 py-1.5 rounded-lg transition ${
+                  activeTab === "templates" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Templates
+              </button>
             </div>
 
             <button
@@ -304,6 +312,30 @@ export const DiscoverImmersiveScreen: React.FC<DiscoverImmersiveScreenProps> = (
                   </button>
                 </div>
               ))}
+            </div>
+          )}
+
+          {activeTab === "templates" && (
+            <div className="space-y-4 max-w-5xl mx-auto">
+              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
+                <h3 className="font-bold text-slate-200 text-sm">Documentation & Project Templates</h3>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                {[
+                  { name: "Documentation Standard", desc: "API, ARCHITECTURE, README, MISSION" },
+                  { name: "Social Media Campaign", desc: "Campaign roadmap, assets, and scheduling" },
+                  { name: "New Hire Onboarding", desc: "Training plan, accounts, and policies" },
+                ].map((tmpl, idx) => (
+                  <div key={idx} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-3 hover:border-amber-500/40 transition">
+                    <h4 className="font-bold text-white text-sm">{tmpl.name}</h4>
+                    <p className="text-xs text-slate-400 leading-snug">{tmpl.desc}</p>
+                    <button className="mt-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition w-full">
+                      Use Template
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

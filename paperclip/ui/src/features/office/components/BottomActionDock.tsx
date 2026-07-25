@@ -11,6 +11,7 @@ import {
   Box,
   Wallet,
   MessageSquare,
+  Compass,
 } from "lucide-react";
 import { useOfficeStore } from "../../../store/officeStore.js";
 
@@ -21,6 +22,7 @@ interface BottomActionDockProps {
   onOpenBoard?: () => void;
   onOpenScheduling?: () => void;
   onOpenFacilities?: () => void;
+  onOpenDiscover?: () => void;
   onOpenDirectory?: () => void;
   onOpenMemory?: () => void;
   onOpenArtifacts?: () => void;
@@ -35,6 +37,7 @@ export const BottomActionDock: React.FC<BottomActionDockProps> = ({
   onOpenBoard,
   onOpenScheduling,
   onOpenFacilities,
+  onOpenDiscover,
   onOpenDirectory,
   onOpenMemory,
   onOpenArtifacts,
@@ -51,6 +54,7 @@ export const BottomActionDock: React.FC<BottomActionDockProps> = ({
     { id: "board", label: "Board", icon: Kanban, action: onOpenBoard, color: "text-cyan-400 hover:bg-cyan-950/40 border-cyan-500/30" },
     { id: "scheduling", label: "Scheduling", icon: Calendar, action: onOpenScheduling, color: "text-emerald-400 hover:bg-emerald-950/40 border-emerald-500/30" },
     { id: "facilities", label: "Facilities", icon: Building2, action: onOpenFacilities, color: "text-amber-400 hover:bg-amber-950/40 border-amber-500/30" },
+    { id: "discover", label: "Discover", icon: Compass, action: onOpenDiscover, color: "text-orange-400 hover:bg-orange-950/40 border-orange-500/30" },
     { id: "directory", label: "Directory", icon: Contact, action: onOpenDirectory, color: "text-teal-400 hover:bg-teal-950/40 border-teal-500/30" },
     { id: "memory", label: "Memory", icon: Brain, action: onOpenMemory, color: "text-pink-400 hover:bg-pink-950/40 border-pink-500/30" },
     { id: "artifacts", label: "Artifacts", icon: Box, action: onOpenArtifacts, color: "text-indigo-400 hover:bg-indigo-950/40 border-indigo-500/30" },
