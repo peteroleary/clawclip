@@ -10,18 +10,65 @@ import { SkillsMarketplaceModal } from "../features/office/components/panels/Ski
 import { RemoteAgentChatPanel } from "../features/office/components/RemoteAgentChatPanel.js";
 import type { Workforce3DMember } from "../features/office/types.js";
 import { Sparkles } from "lucide-react";
+import { useOfficeStore, OfficeEntity } from "../store/officeStore.js";
+
+import { KanbanImmersiveScreen } from "../features/office/screens/KanbanImmersiveScreen.js";
 
 export const OfficePage: React.FC = () => {
   const { companyId } = useParams<{ companyId: string }>();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const initialNewTask = searchParams.get("action") === "new_task";
   const navigate = useNavigate();
   const [workforce, setWorkforce] = useState<Workforce3DMember[]>([]);
-  const [selectedMember, setSelectedMember] = useState<Workforce3DMember | null>(null);
-  const [hqOpen, setHqOpen] = useState<boolean>(true);
-  const [marketplaceOpen, setMarketplaceOpen] = useState<boolean>(false);
-  const [orgChartOpen, setOrgChartOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const activePanels = useOfficeStore((state) => state.activePanels);
+  const setActiveDrawer = useOfficeStore((state) => state.setActiveDrawer);
+  const selectedEntity = useOfficeStore((state) => state.selectedEntity);
+  const setSelectedEntity = useOfficeStore((state) => state.setSelectedEntity);
+  const setCameraTarget = useOfficeStore((state) => state.setCameraTarget);
+
+  // Sync URL search params with Zustand store
+  useEffect(() => {
+    const panel = searchParams.get("panel");
+    const rightPanel = searchParams.get("rightPanel") || (panel === "hq" ? "hq" : null);
+    const leftPanel = searchParams.get("leftPanel") || (panel === "projects" ? "projects" : null);
+    const bottomPanel = searchParams.get("bottomPanel") || null;
+
+    if (rightPanel) setActiveDrawer("right", rightPanel);
+    if (leftPanel) setActiveDrawer("left", leftPanel);
+    if (bottomPanel) setActiveDrawer("bottom", bottomPanel);
+
+    const entityId = searchParams.get("entityId");
+    const entityType = searchParams.get("entityType") as OfficeEntity["type"];
+    
+    if (entityId && entityType) {
+      setSelectedEntity({ id: entityId, type: entityType });
+    }
+  }, [searchParams, setActiveDrawer, setSelectedEntity]);
+
+  // Sync Zustand store with URL (when state changes internally)
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (activePanels.right) params.set("rightPanel", activePanels.right);
+    else params.delete("rightPanel");
+
+    if (activePanels.left) params.set("leftPanel", activePanels.left);
+    else params.delete("leftPanel");
+
+    if (activePanels.bottom) params.set("bottomPanel", activePanels.bottom);
+    else params.delete("bottomPanel");
+
+    if (selectedEntity) {
+      params.set("entityId", selectedEntity.id);
+      params.set("entityType", selectedEntity.type);
+    } else {
+      params.delete("entityId");
+      params.delete("entityType");
+    }
+    
+    setSearchParams(params, { replace: true });
+  }, [activePanels.right, activePanels.left, selectedEntity, setSearchParams]);
 
   useEffect(() => {
     async function fetchWorkforce() {
@@ -54,24 +101,8 @@ export const OfficePage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen w-full bg-[#06090d] text-slate-100 font-sans overflow-hidden relative select-none">
-      {/* 1. Top Personnel Command Bar */}
-      <TopPersonnelBar
-        workforce={workforce}
-        onSelectMember={(member) => setSelectedMember(member)}
-        onOpenOrgChart={() => setOrgChartOpen(true)}
-      />
-
-      {/* 3. Left Side Business Drawer Panel */}
-      <LeftBusinessDrawer
-        onOpenProjects={() => navigate(companyId ? `/companies/${companyId}/projects` : "/projects")}
-        onOpenFacilities={() => navigate("/office")}
-        onOpenDirectory={() => navigate(companyId ? `/companies/${companyId}/human-employees` : "/human-employees")}
-        onOpenOffers={() => navigate(companyId ? `/companies/${companyId}/apps` : "/apps")}
-        onOpenCreateBusiness={() => navigate(companyId ? `/companies/${companyId}/projects` : "/projects")}
-      />
-
-      {/* Main 3D Office Workspace Viewport */}
-      <div className="flex-1 w-full h-full relative overflow-hidden pt-16 pb-16">
+      {/* Main 3D Office Workspace Viewport (Bare) */}
+      <div className="w-full h-full relative overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-full text-slate-400 space-x-2 bg-[#06090d]">
             <Sparkles className="w-6 h-6 animate-spin text-cyan-400" />
@@ -80,51 +111,31 @@ export const OfficePage: React.FC = () => {
         ) : (
           <RetroOffice3D
             workforce={workforce}
-            selectedMemberId={selectedMember?.id}
-            onSelectMember={(member) => setSelectedMember(member)}
+            selectedMemberId={selectedEntity?.type === "human" || selectedEntity?.type === "agent" ? selectedEntity.id : undefined}
+            onSelectMember={(member) => {
+              setSelectedEntity({ type: member.type === "agent" ? "agent" : "human", id: member.id });
+              setActiveDrawer("right", "chat");
+            }}
             companyId={companyId}
             initialKanbanCreateMode={initialNewTask}
           />
         )}
-
-        {/* 4. Right Side Platform HQ Drawer */}
-        <HQSidebar
-          open={hqOpen}
-          onToggle={() => setHqOpen(!hqOpen)}
-          onOpenMarketplace={() => setMarketplaceOpen(true)}
-          onAddHuman={() => navigate(companyId ? `/companies/${companyId}/human-employees` : "/human-employees")}
-          onAddAgent={() => navigate(companyId ? `/companies/${companyId}/agents/new` : "/agents/new")}
-          workforce={workforce}
-        />
-
-        {/* Chat Drawer when a member is selected */}
-        <RemoteAgentChatPanel
-          member={selectedMember}
-          onClose={() => setSelectedMember(null)}
-        />
-
-        {/* Skills & Capability Marketplace Modal */}
-        <SkillsMarketplaceModal
-          isOpen={marketplaceOpen}
-          onClose={() => setMarketplaceOpen(false)}
-          companyId={companyId}
-        />
-
-        {/* Org Chart Modal */}
-        <OrgChartImmersiveModal
-          isOpen={orgChartOpen}
-          onClose={() => setOrgChartOpen(false)}
-          workforce={workforce}
-        />
       </div>
 
-      {/* 2. Bottom Action & Time Floating Dock */}
+      {/* Floating Bottom Action Dock: Board | + | Routines */}
       <BottomActionDock
-        onOpenGoals={() => navigate(companyId ? `/companies/${companyId}/goals` : "/goals")}
-        onOpenBoard={() => navigate(companyId ? `/companies/${companyId}/issues` : "/issues")}
-        onOpenTimeline={() => navigate(companyId ? `/companies/${companyId}/timeline` : "/timeline")}
-        onOpenRoutines={() => navigate(companyId ? `/companies/${companyId}/routines` : "/routines")}
-        onOpenCreateMenu={() => navigate("/office?action=new_task")}
+        onOpenBoard={() => setActiveDrawer("bottom", "board")}
+        onOpenCreateMenu={() => setActiveDrawer("bottom", "create")}
+        onOpenRoutines={() => setActiveDrawer("bottom", "routines")}
+      />
+
+      {/* Full-Screen Immersive Kanban Board Screen */}
+      <KanbanImmersiveScreen
+        isOpen={activePanels.bottom === "board"}
+        onClose={() => setActiveDrawer("bottom", null)}
+        companyId={companyId}
+        initialCreateMode={initialNewTask}
+        workforce={workforce}
       />
     </div>
   );

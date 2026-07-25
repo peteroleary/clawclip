@@ -103,6 +103,7 @@ export function Layout() {
   const { enabled: appsEnabled } = useAppsEnabled();
   const isCompanySettingsRoute = location.pathname.includes("/company/settings");
   const companyPathSegments = getCompanyPathSegments(location.pathname, companyPrefix);
+  const isOfficeRoute = companyPathSegments[0]?.toLowerCase() === "office" || location.pathname.endsWith("/office");
   const isToolsRoute = companyPathSegments[0]?.toLowerCase() === "tools";
   const isAppsRoute = companyPathSegments[0]?.toLowerCase() === "apps";
   const appDetailConnectionId =
@@ -562,7 +563,7 @@ export function Layout() {
           />
         )}
 
-        {isMobile ? (
+        {!isOfficeRoute && (isMobile ? (
           <div
             className={cn(
               "fixed inset-y-0 left-0 z-50 flex flex-col overflow-hidden pt-(--sz-safe-top) transition-transform duration-100 ease-out",
@@ -600,7 +601,7 @@ export function Layout() {
               version={health?.version}
             />
           </SidebarShell>
-        )}
+        ))}
 
         {!isMobile && hasSecondarySidebar ? (
           <SecondarySidebar>{secondarySidebar}</SecondarySidebar>
@@ -613,7 +614,7 @@ export function Layout() {
             )}
           >
             <StandaloneBrowserControls mobile={isMobile} />
-            <BreadcrumbBar />
+            {!isOfficeRoute && <BreadcrumbBar />}
             {isMobile && isCompanySettingsRoute ? (
               <div className="border-b border-border px-4 pb-3">
                 <CompanySettingsNav />
@@ -626,13 +627,14 @@ export function Layout() {
               ref={mainContentRef}
               tabIndex={-1}
               className={cn(
-                "flex-1 p-4 outline-none md:p-6",
+                "flex-1 outline-none",
+                isOfficeRoute ? "p-0 overflow-hidden" : "p-4 md:p-6",
                 // Reserve the scrollbar gutter on desktop so pages whose height
                 // changes (e.g. switching skill-detail tabs) don't widen/shift
                 // when the vertical scrollbar appears or disappears (PAP-10907).
                 isMobile
                   ? "overflow-visible pb-(--sz-calc-14)"
-                  : "overflow-auto [scrollbar-gutter:stable]",
+                  : isOfficeRoute ? "overflow-hidden" : "overflow-auto [scrollbar-gutter:stable]",
               )}
             >
               {hasUnknownCompanyPrefix ? (

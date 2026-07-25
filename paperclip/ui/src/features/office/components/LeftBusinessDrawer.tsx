@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { FolderOpen, Building, Contact, Tag, Plus, ChevronLeft, ChevronRight, Sparkles, X } from "lucide-react";
+import { FolderOpen, Building, Contact, Tag, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { useOfficeStore } from "../../../store/officeStore.js";
 
 interface LeftBusinessDrawerProps {
   onOpenProjects: () => void;
@@ -17,7 +18,7 @@ export const LeftBusinessDrawer: React.FC<LeftBusinessDrawerProps> = ({
   onOpenCreateBusiness,
 }) => {
   const [expanded, setExpanded] = useState(true);
-  const [activeItem, setActiveItem] = useState<string | null>(null);
+  const activeItem = useOfficeStore((state) => state.activePanels.left);
 
   const businessItems = [
     { id: "projects", label: "Projects", icon: FolderOpen, action: onOpenProjects, desc: "Active workspace initiatives" },
@@ -67,7 +68,6 @@ export const LeftBusinessDrawer: React.FC<LeftBusinessDrawerProps> = ({
               <button
                 key={item.id}
                 onClick={() => {
-                  setActiveItem(item.id);
                   item.action();
                 }}
                 className={`w-full p-2.5 rounded-xl border border-transparent text-left flex items-center space-x-3 transition group ${
