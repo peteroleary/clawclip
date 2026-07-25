@@ -6,14 +6,14 @@ import type { Workforce3DMember } from "./types.js";
 
 interface WorkforceAvatar3DProps {
   member: Workforce3DMember;
-  position: [number, number, number];
+  targetPosition: [number, number, number];
   isSelected?: boolean;
   onSelect?: (member: Workforce3DMember) => void;
 }
 
 export const WorkforceAvatar3D: React.FC<WorkforceAvatar3DProps> = ({
   member,
-  position,
+  targetPosition,
   isSelected,
   onSelect,
 }) => {
@@ -40,11 +40,42 @@ export const WorkforceAvatar3D: React.FC<WorkforceAvatar3DProps> = ({
   const skinColor = member.avatarConfig.skinTone || "#fdba74";
   const hairColor = member.avatarConfig.hairColor || "#1e293b";
 
-  useFrame((state) => {
+  const currentPosRef = useRef<THREE.Vector3>(new THREE.Vector3(...targetPosition));
+
+  useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
     if (groupRef.current) {
-      // Gentle breathing idle animation
-      groupRef.current.position.y = position[1] + Math.sin(t * 2.5 + position[0]) * 0.03;
+      const targetPosVec = new THREE.Vector3(...targetPosition);
+      const dist = currentPosRef.current.distanceTo(targetPosVec);
+      
+      if (dist > 0.05) {
+        // Moving: Lerp towards target
+        currentPosRef.current.lerp(targetPosVec, delta * 3);
+        
+        // Add a bounce effect to simulate walking
+        const bounce = Math.abs(Math.sin(t * 15)) * 0.15;
+        groupRef.current.position.set(currentPosRef.current.x, targetPosition[1] + bounce, currentPosRef.current.z);
+
+        // Rotate to face movement direction
+        const dx = targetPosVec.x - currentPosRef.current.x;
+        const dz = targetPosVec.z - currentPosRef.current.z;
+        const targetAngle = Math.atan2(dx, dz);
+        
+        // Smooth rotation
+        let currentRot = groupRef.current.rotation.y;
+        // Fix wrap-around for lerping rotation (simple approach for now)
+        groupRef.current.rotation.y = THREE.MathUtils.lerp(currentRot, targetAngle, delta * 8);
+      } else {
+        // Idle
+        currentPosRef.current.copy(targetPosVec);
+        groupRef.current.position.set(
+          currentPosRef.current.x, 
+          targetPosition[1] + Math.sin(t * 2.5 + currentPosRef.current.x) * 0.03, 
+          currentPosRef.current.z
+        );
+        // Face forward when idle
+        groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, delta * 5);
+      }
     }
 
     if (isWorking) {
@@ -61,7 +92,9 @@ export const WorkforceAvatar3D: React.FC<WorkforceAvatar3DProps> = ({
   return (
     <group
       ref={groupRef}
-      position={position}
+      // initial position to prevent flash at 0,0,0
+      position={currentPosRef.current}
+
       onClick={(e) => {
         e.stopPropagation();
         onSelect?.(member);

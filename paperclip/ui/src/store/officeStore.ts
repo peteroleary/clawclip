@@ -1,6 +1,37 @@
 import { create } from "zustand";
 import { FacilityItem, initialFacilities } from "../features/office/screens/FacilitiesImmersiveScreen";
 
+export const CLASSROOM_NODES: [number, number, number][] = [
+  [-4, 0.75, -3], [-4, 0.75, 0], [-4, 0.75, 3], // Eng Desks
+  [4, 0.75, -3], [4, 0.75, 0], [4, 0.75, 3], // AI Desks
+  [-1.5, 0.75, -6.5], [1.5, 0.75, -6.5], // Standup area
+  [-2, 0.75, 5.5], [2, 0.75, 5.5], // Lounge area
+  [0, 0.75, -8], // Whiteboard presentation
+];
+
+export const OFFICE_NODES: [number, number, number][] = [
+  [0, 0.5, -4.8], // Executive Chair
+  [-0.8, 0.45, -2.8], [0.8, 0.45, -2.8], // Guest Chairs
+  [-7.5, 0.45, 1], [-7.5, 0.45, 2], [-7.5, 0.45, 3], // Conf Left Chairs
+  [-4.5, 0.45, 1], [-4.5, 0.45, 2], [-4.5, 0.45, 3], // Conf Right Chairs
+  [4.5, 0.3, 4], [7.5, 0.3, 4], // Sofa seats
+];
+
+export const getNodesForFacility = (facility: FacilityItem | null): [number, number, number][] => {
+  if (!facility) return CLASSROOM_NODES;
+  if (facility.type === "Office") return OFFICE_NODES;
+  if (facility.type === "Classroom") return CLASSROOM_NODES;
+
+  // For all other presets, generate safe grid nodes based on dimensions
+  const w = (facility.widthMeters || 20) * 0.35;
+  const d = (facility.depthMeters || 15) * 0.35;
+  return [
+    [-w, 0.5, -d], [0, 0.5, -d], [w, 0.5, -d],
+    [-w, 0.5, 0], [0, 0.5, 0], [w, 0.5, 0],
+    [-w, 0.5, d], [0, 0.5, d], [w, 0.5, d],
+  ];
+};
+
 export interface OfficeEntity {
   type: "project" | "human" | "agent" | "facility" | "task" | "goal";
   id: string;
@@ -51,6 +82,10 @@ interface OfficeState {
   // Facilities
   activeFacility: FacilityItem | null;
   setActiveFacility: (facility: FacilityItem) => void;
+
+  // Ambient Movement & State
+  facilityWorkforceState: Record<string, Record<string, [number, number, number]>>;
+  setMemberPosition: (facilityId: string, memberId: string, position: [number, number, number]) => void;
 }
 
 export const useOfficeStore = create<OfficeState>((set) => ({
@@ -96,4 +131,19 @@ export const useOfficeStore = create<OfficeState>((set) => ({
 
   activeFacility: initialFacilities.find(f => f.isCurrentOffice) || initialFacilities[0],
   setActiveFacility: (facility) => set({ activeFacility: facility }),
+
+  facilityWorkforceState: {},
+  setMemberPosition: (facilityId, memberId, position) =>
+    set((state) => {
+      const facilityState = state.facilityWorkforceState[facilityId] || {};
+      return {
+        facilityWorkforceState: {
+          ...state.facilityWorkforceState,
+          [facilityId]: {
+            ...facilityState,
+            [memberId]: position,
+          },
+        },
+      };
+    }),
 }));

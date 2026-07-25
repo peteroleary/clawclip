@@ -9,7 +9,7 @@ import { StandupImmersiveScreen } from "./screens/StandupImmersiveScreen.js";
 import { KanbanImmersiveScreen } from "./screens/KanbanImmersiveScreen.js";
 import type { Workforce3DMember } from "./types.js";
 import { MessageSquare, Volume2, Shield, Sparkles, Building2, Kanban } from "lucide-react";
-import { useOfficeStore } from "../../store/officeStore.js";
+import { useOfficeStore, getNodesForFacility } from "../../store/officeStore";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -127,19 +127,43 @@ export const RetroOffice3D: React.FC<RetroOffice3DProps> = ({
     else if (deskId.includes("kanban") || deskId.includes("board")) setKanbanOpen(true);
   };
 
-  // Pre-calculated isometric 3D desk slots matching claw3d-hero.png
-  const deskSlots: [number, number, number][] = [
-    [-5, 0.75, -2],
-    [-5, 0.75, 1],
-    [-5, 0.75, 4],
-    [5, 0.75, -2],
-    [5, 0.75, 1],
-    [5, 0.75, 4],
-    [-1.5, 0.75, -6.5],
-    [1.5, 0.75, -6.5],
-    [-2, 0.75, 5.5],
-    [2, 0.75, 5.5],
-  ];
+  const activeFacility = useOfficeStore((state) => state.activeFacility);
+  const facilityWorkforceState = useOfficeStore((state) => state.facilityWorkforceState);
+  const setMemberPosition = useOfficeStore((state) => state.setMemberPosition);
+
+  // Layout-specific valid nodes for ambient movement & spawning
+  const validNodes = getNodesForFacility(activeFacility);
+
+  // 1. Initial Position Assignment per Facility
+  React.useEffect(() => {
+    if (!activeFacility) return;
+    const currentFacilityState = useOfficeStore.getState().facilityWorkforceState[activeFacility.id] || {};
+    
+    workforce.forEach((member) => {
+      // If this member hasn't been placed in this facility yet, place them randomly
+      if (!currentFacilityState[member.id]) {
+        const randomNode = validNodes[Math.floor(Math.random() * validNodes.length)];
+        setMemberPosition(activeFacility.id, member.id, randomNode);
+      }
+    });
+  }, [activeFacility, workforce, validNodes, setMemberPosition]);
+
+  // 2. Ambient Movement Simulation (every 4-8 seconds)
+  React.useEffect(() => {
+    if (!activeFacility) return;
+    
+    const interval = setInterval(() => {
+      if (workforce.length === 0) return;
+      // Pick a random member
+      const randomMember = workforce[Math.floor(Math.random() * workforce.length)];
+      // Pick a random valid node
+      const randomNode = validNodes[Math.floor(Math.random() * validNodes.length)];
+      
+      setMemberPosition(activeFacility.id, randomMember.id, randomNode);
+    }, 5000 + Math.random() * 3000);
+    
+    return () => clearInterval(interval);
+  }, [activeFacility, workforce, validNodes, setMemberPosition]);
 
   const activeMember = workforce.find((m) => m.id === selectedEntity?.id);
   const controlsRef = React.useRef<any>(null);
@@ -182,14 +206,16 @@ export const RetroOffice3D: React.FC<RetroOffice3DProps> = ({
         )}
 
         {/* Rendering Team Members with Dark Floating Nameplates */}
-        {workforce.map((member, index) => {
-          const pos = deskSlots[index % deskSlots.length];
+        {workforce.map((member) => {
+          const currentFacilityState = facilityWorkforceState[activeFacility?.id || ""] || {};
+          const targetPos = currentFacilityState[member.id] || validNodes[0];
           const isSelected = selectedMemberId === member.id || selectedEntity?.id === member.id;
+          
           return (
             <WorkforceAvatar3D
               key={member.id}
               member={member}
-              position={pos}
+              targetPosition={targetPos}
               isSelected={isSelected}
               onSelect={handleSelect}
             />
