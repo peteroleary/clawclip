@@ -148,19 +148,21 @@ export const RetroOffice3D: React.FC<RetroOffice3DProps> = ({
     });
   }, [activeFacility, workforce, validNodes, setMemberPosition]);
 
-  // 2. Ambient Movement Simulation (every 4-8 seconds)
+  // 2. Ambient Movement Simulation (every 3 seconds)
   React.useEffect(() => {
     if (!activeFacility) return;
     
     const interval = setInterval(() => {
       if (workforce.length === 0) return;
-      // Pick a random member
-      const randomMember = workforce[Math.floor(Math.random() * workforce.length)];
-      // Pick a random valid node
-      const randomNode = validNodes[Math.floor(Math.random() * validNodes.length)];
       
-      setMemberPosition(activeFacility.id, randomMember.id, randomNode);
-    }, 5000 + Math.random() * 3000);
+      // Give each member a 30% chance to move to a new random node to make the office look alive
+      workforce.forEach(member => {
+        if (Math.random() < 0.3) {
+          const randomNode = validNodes[Math.floor(Math.random() * validNodes.length)];
+          setMemberPosition(activeFacility.id, member.id, randomNode);
+        }
+      });
+    }, 3000);
     
     return () => clearInterval(interval);
   }, [activeFacility, workforce, validNodes, setMemberPosition]);

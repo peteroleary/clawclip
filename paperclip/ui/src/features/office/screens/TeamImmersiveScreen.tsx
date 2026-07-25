@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Users, User, Bot, Network, Layers, ShieldCheck, Plus, Move, DollarSign, Mail, Phone, Clock, Shield, Kanban, MessageSquare, Link2 } from "lucide-react";
+import { X, Users, User, Bot, Network, Layers, ShieldCheck, Plus, Move, DollarSign, Mail, Phone, Clock, Shield, Kanban, MessageSquare, Link2, Edit2, Target, Folder, CheckSquare, Zap, FileText } from "lucide-react";
 import type { Workforce3DMember } from "../types.js";
 import { useOfficeStore } from "../../../store/officeStore.js";
 
@@ -18,7 +18,13 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
   const openEntityChat = useOfficeStore((state) => state.openEntityChat);
   const openLinkModal = useOfficeStore((state) => state.openLinkModal);
 
-  const [activeTab, setActiveTab] = useState<"org" | "departments" | "teams" | "swarms" | "troops" | "humans" | "agents">("org");
+  const [activeTab, setActiveTab] = useState<"org" | "departments" | "humans" | "agents" | "teams" | "swarms" | "troops">("org");
+  const [selectedEntity, setSelectedEntity] = useState<any>(null);
+  const [editingEntityId, setEditingEntityId] = useState<string | null>(null);
+
+  // Filter & Sort State
+  const [filterStatus, setFilterStatus] = useState("All");
+  const [sortBy, setSortBy] = useState<"name" | "budget" | "cost" | "headcount">("name");
 
   // Modal Visibility States
   const [showHumanModal, setShowHumanModal] = useState(false);
@@ -42,6 +48,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
   const [hReportsTo, setHReportsTo] = useState("");
   const [hPayType, setHPayType] = useState("Salaried");
   const [hSalary, setHSalary] = useState("120000");
+  const [hStatus, setHStatus] = useState("Active");
 
   // Agent Form State
   const [aName, setAName] = useState("");
@@ -49,26 +56,31 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
   const [aModel, setAModel] = useState("Claude 3.5 Sonnet");
   const [aPrompt, setAPrompt] = useState("");
   const [aCost, setACost] = useState("500");
+  const [aStatus, setAStatus] = useState("Active");
 
   // Dept Form State
   const [deptName, setDeptName] = useState("");
   const [deptHead, setDeptHead] = useState("");
   const [deptBudget, setDeptBudget] = useState("500000");
+  const [deptStatus, setDeptStatus] = useState("Active");
 
   // Team Form State
   const [teamName, setTeamName] = useState("");
   const [teamLead, setTeamLead] = useState("");
   const [teamBudget, setTeamBudget] = useState("500000");
+  const [teamStatus, setTeamStatus] = useState("Active");
 
   // Swarm Form State
   const [swarmName, setSwarmName] = useState("");
   const [swarmLead, setSwarmLead] = useState("");
   const [swarmBudget, setSwarmBudget] = useState("100000");
+  const [swarmStatus, setSwarmStatus] = useState("Active");
 
   // Troop Form State
   const [troopName, setTroopName] = useState("");
   const [troopLead, setTroopLead] = useState("");
   const [troopBudget, setTroopBudget] = useState("750000");
+  const [troopStatus, setTroopStatus] = useState("Active");
 
   // Org Link Form State
   const [orgManager, setOrgManager] = useState("");
@@ -88,6 +100,9 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
             department: "Executive",
             status: "active",
             skills: ["Leadership", "Product Vision"],
+            tasks: ["Approve Q3 Budget", "Review Platform Architecture"],
+            routines: ["Weekly All Hands", "Daily Exec Standup"],
+            artifacts: ["Q3_Strategy.pdf", "Company_Vision.md"],
             annualSalary: 250000,
             deskPosition: { x: 0, y: 0 },
             avatarConfig: {},
@@ -101,6 +116,9 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
             department: "Engineering",
             status: "active",
             skills: ["Architecture", "React", "TypeScript"],
+            tasks: ["Review PR #45", "Draft Technical Spec for Sync"],
+            routines: ["Daily Standup @ 10am EST"],
+            artifacts: ["Engineering_Roadmap.md", "System_Architecture.pdf"],
             annualSalary: 185000,
             deskPosition: { x: 2, y: 0 },
             avatarConfig: {},
@@ -114,6 +132,9 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
             department: "Swarm Ops",
             status: "working",
             skills: ["Refactoring", "Code Review"],
+            tasks: ["Refactor User Auth", "Optimize Database Queries"],
+            routines: ["Continuous Integration Checks", "Nightly Code Quality Scan"],
+            artifacts: ["Auth_Module.ts", "DB_Optimization_Report.md"],
             monthlyCost: 350,
             deskPosition: { x: -2, y: 0 },
             avatarConfig: {},
@@ -127,6 +148,9 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
             department: "Swarm Ops",
             status: "working",
             skills: ["Orchestration", "Task Allocation"],
+            tasks: ["Allocate Bug Fixes to Swarms", "Monitor Swarm Health"],
+            routines: ["Hourly Health Checks"],
+            artifacts: ["Swarm_Metrics_Dashboard.json"],
             monthlyCost: 600,
             deskPosition: { x: -4, y: 0 },
             avatarConfig: {},
@@ -135,21 +159,21 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
   );
 
   const [departments, setDepartments] = useState([
-    { name: "Executive & HQ", lead: "Alex Mercer", count: "3 Members", color: "border-purple-500/30 bg-purple-950/20", budget: 1500000, spent: 450000 },
-    { name: "Engineering & Architecture", lead: "Sarah Chen", count: "8 Members", color: "border-cyan-500/30 bg-cyan-950/20", budget: 3500000, spent: 1200000 },
-    { name: "Autonomous Swarms & Ops", lead: "Hermes Manager", count: "12 Agents", color: "border-emerald-500/30 bg-emerald-950/20", budget: 800000, spent: 750000 },
+    { id: "dept_1", name: "Executive & HQ", lead: "Alex Mercer", count: "3 Members", color: "border-purple-500/30 bg-purple-950/20", budget: 1500000, spent: 450000, status: "Active", targets: ["Increase Q3 Revenue by 15%", "Secure Series B Funding"], projects: ["Global Expansion", "Platform Re-architecture"], routines: ["Monthly Board Meeting"], artifacts: ["Q3_Financials.pdf"] },
+    { id: "dept_2", name: "Engineering & Architecture", lead: "Sarah Chen", count: "8 Members", color: "border-cyan-500/30 bg-cyan-950/20", budget: 3500000, spent: 1200000, status: "Active", targets: ["Ship v1.0 Alpha", "Reduce Latency by 20%"], projects: ["Paperclip UI Rewrite", "Office 3D Environment"], routines: ["Weekly Sprint Planning", "Bi-weekly Retrospective"], artifacts: ["API_Docs.md"] },
+    { id: "dept_3", name: "Autonomous Swarms & Ops", lead: "Hermes Manager", count: "12 Agents", color: "border-emerald-500/30 bg-emerald-950/20", budget: 800000, spent: 750000, status: "Active", targets: ["Automate 80% of QA", "0 Sev-1 Incidents"], projects: ["AI Office Automation", "Self-Healing Infrastructure"], routines: ["Continuous Deployment"], artifacts: ["Ops_Runbook.md"] },
   ]);
 
   const [teams, setTeams] = useState([
-    { name: "Core Product Squad", desc: "Builds web UI and 3D office platform features.", members: "4 Staff", budget: 1200000, spent: 500000 },
+    { id: "team_1", name: "Core Product Squad", desc: "Builds web UI and 3D office platform features.", members: "4 Staff", budget: 1200000, spent: 500000, status: "Active", targets: ["Launch New Dashboard", "Improve User Onboarding"], projects: ["Dashboard V2"], routines: ["Daily Sync"], artifacts: ["Figma_Mockups.url"] },
   ]);
 
   const [swarms, setSwarms] = useState([
-    { name: "AI Swarm Alpha", desc: "Autonomous background agents handling code reviews and deployments.", members: "6 Agents", budget: 20000, spent: 18000 },
+    { id: "swarm_1", name: "AI Swarm Alpha", desc: "Autonomous background agents handling code reviews and deployments.", members: "6 Agents", budget: 20000, spent: 18000, status: "Active", targets: ["Process 100 PRs/day", "Zero Deployment Rollbacks"], projects: ["CI/CD Pipeline Automation"], routines: ["Real-time PR Monitoring"], skills: ["Python", "Docker", "Kubernetes"], artifacts: ["Deployment_Logs.txt"] },
   ]);
 
   const [troops, setTroops] = useState([
-    { name: "Full-Stack Deployment Troop", desc: "Combined human engineers and agent automation swarms.", members: "4 Staff + 5 Agents", budget: 500000, spent: 210000 },
+    { id: "troop_1", name: "Full-Stack Deployment Troop", desc: "Combined human engineers and agent automation swarms.", members: "4 Staff + 5 Agents", budget: 500000, spent: 210000, status: "Active", targets: ["Migrate to Cloud-Native", "Establish DevOps Culture"], projects: ["Infrastructure as Code", "Monitoring Revamp"], routines: ["Weekly DevOps Sync"], artifacts: ["Terraform_State.json"] },
   ]);
 
   useEffect(() => {
@@ -181,57 +205,175 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
 
   if (!isOpen) return null;
 
-  const humans = workforceList.filter((m) => m.type === "human");
-  const agents = workforceList.filter((m) => m.type === "agent");
+  const getFilteredAndSorted = (items: any[]) => {
+    let result = items;
+    if (filterStatus !== "All") {
+      result = result.filter((i) => (i.status || "Active").toLowerCase() === filterStatus.toLowerCase());
+    }
+    
+    result = [...result].sort((a, b) => {
+      if (sortBy === "name") {
+        return (a.name || "").localeCompare(b.name || "");
+      }
+      if (sortBy === "budget") {
+        const aVal = a.budget ?? a.annualSalary ?? a.monthlyCost ?? 0;
+        const bVal = b.budget ?? b.annualSalary ?? b.monthlyCost ?? 0;
+        return bVal - aVal;
+      }
+      if (sortBy === "headcount") {
+        const getCount = (str: string) => parseInt(str) || 0;
+        const aCount = a.count ? getCount(a.count) : (a.members ? getCount(a.members) : 1);
+        const bCount = b.count ? getCount(b.count) : (b.members ? getCount(b.members) : 1);
+        return bCount - aCount;
+      }
+      return 0;
+    });
+    return result;
+  };
+
+  const humans = getFilteredAndSorted(workforceList.filter((m) => m.type === "human"));
+  const agents = getFilteredAndSorted(workforceList.filter((m) => m.type === "agent"));
 
   // Handlers
   const handleAddHuman = (e: React.FormEvent) => {
     e.preventDefault();
     if (!hFirstName.trim() || !hLastName.trim()) return;
-
     const newH: Workforce3DMember = {
-      id: `h_${Date.now()}`,
-      name: `${hFirstName.trim()} ${hLastName.trim()}`,
-      role: hRole || "Software Engineer",
-      title: hRole || "Software Engineer",
+      id: editingEntityId || `h_${Date.now()}`,
+      name: `${hFirstName} ${hLastName}`,
+      role: hRole,
       type: "human",
-      department: "Engineering",
-      status: "active",
-      reportsTo: hReportsTo || undefined,
+      title: hRole,
+      department: "Unassigned",
+      status: hStatus,
+      skills: [],
       annualSalary: parseInt(hSalary, 10) || 0,
-      skills: ["Generalist"],
-      deskPosition: { x: 1, y: 1 },
+      deskPosition: { x: 0, y: 0 },
       avatarConfig: {},
     };
-
-    setWorkforceList([...workforceList, newH]);
+    if (editingEntityId) {
+      setWorkforceList(workforceList.map(w => w.id === editingEntityId ? newH : w));
+    } else {
+      setWorkforceList([...workforceList, newH]);
+    }
     setHFirstName("");
     setHLastName("");
+    setHRole("");
+    setHStatus("Active");
+    setEditingEntityId(null);
     setShowHumanModal(false);
   };
 
   const handleAddAgent = (e: React.FormEvent) => {
     e.preventDefault();
     if (!aName.trim()) return;
-
     const newA: Workforce3DMember = {
-      id: `a_${Date.now()}`,
-      name: aName.trim(),
-      role: aRole || "Autonomous Agent",
-      title: aModel,
+      id: editingEntityId || `a_${Date.now()}`,
+      name: aName,
+      role: aRole,
       type: "agent",
-      department: "Swarm Ops",
-      status: "working",
+      title: aModel,
+      department: "Unassigned",
+      status: aStatus,
+      skills: [],
       monthlyCost: parseInt(aCost, 10) || 0,
-      skills: ["AI Automation"],
-      deskPosition: { x: -1, y: 1 },
+      deskPosition: { x: 0, y: 0 },
       avatarConfig: {},
     };
-
-    setWorkforceList([...workforceList, newA]);
+    if (editingEntityId) {
+      setWorkforceList(workforceList.map(w => w.id === editingEntityId ? newA : w));
+    } else {
+      setWorkforceList([...workforceList, newA]);
+    }
     setAName("");
+    setARole("");
+    setAStatus("Active");
+    setEditingEntityId(null);
     setShowAgentModal(false);
   };
+
+  const handleAddDept = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!deptName.trim()) return;
+    if (editingEntityId) {
+      setDepartments(departments.map(d => d.id === editingEntityId ? { ...d, name: deptName, lead: deptHead, budget: parseInt(deptBudget, 10) || 0, status: deptStatus } : d));
+    } else {
+      setDepartments([...departments, { id: `dept_${Date.now()}`, name: deptName, lead: deptHead || "Unassigned", count: "0 Members", color: "border-slate-500/30 bg-slate-950/20", budget: parseInt(deptBudget, 10) || 0, spent: 0, status: deptStatus }]);
+    }
+    setDeptName("");
+    setDeptHead("");
+    setDeptStatus("Active");
+    setEditingEntityId(null);
+    setShowDeptModal(false);
+  };
+
+  const handleAddTeam = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!teamName.trim()) return;
+    if (editingEntityId) {
+      setTeams(teams.map(t => t.id === editingEntityId ? { ...t, name: teamName, lead: teamLead, budget: parseInt(teamBudget, 10) || 0, status: teamStatus } : t));
+    } else {
+      setTeams([...teams, { id: `team_${Date.now()}`, name: teamName, desc: "New Team", lead: teamLead, members: "0 Staff", budget: parseInt(teamBudget, 10) || 0, spent: 0, status: teamStatus }]);
+    }
+    setTeamName("");
+    setTeamLead("");
+    setTeamStatus("Active");
+    setEditingEntityId(null);
+    setShowTeamModal(false);
+  };
+
+  const handleAddSwarm = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!swarmName.trim()) return;
+    if (editingEntityId) {
+      setSwarms(swarms.map(s => s.id === editingEntityId ? { ...s, name: swarmName, lead: swarmLead, budget: parseInt(swarmBudget, 10) || 0, status: swarmStatus } : s));
+    } else {
+      setSwarms([...swarms, { id: `swarm_${Date.now()}`, name: swarmName, desc: "New Swarm", lead: swarmLead, members: "0 Agents", budget: parseInt(swarmBudget, 10) || 0, spent: 0, status: swarmStatus }]);
+    }
+    setSwarmName("");
+    setSwarmLead("");
+    setSwarmStatus("Active");
+    setEditingEntityId(null);
+    setShowSwarmModal(false);
+  };
+
+  const handleAddTroop = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!troopName.trim()) return;
+    if (editingEntityId) {
+      setTroops(troops.map(t => t.id === editingEntityId ? { ...t, name: troopName, lead: troopLead, budget: parseInt(troopBudget, 10) || 0, status: troopStatus } : t));
+    } else {
+      setTroops([...troops, { id: `troop_${Date.now()}`, name: troopName, desc: "New Troop", lead: troopLead, members: "0 Staff + 0 Agents", budget: parseInt(troopBudget, 10) || 0, spent: 0, status: troopStatus }]);
+    }
+    setTroopName("");
+    setTroopLead("");
+    setTroopStatus("Active");
+    setEditingEntityId(null);
+    setShowTroopModal(false);
+  };
+
+  const getTabHeader = () => {
+    switch(activeTab) {
+      case "org":
+        return { title: "Interactive Drag & Drop Hierarchy", btnText: "Link Manager & Subordinate", action: () => setShowOrgLinkModal(true), icon: <Network className="w-5 h-5 text-purple-400" />, desc: "Rearrange reporting trees between executives, leads, and agent swarms" };
+      case "departments":
+        return { title: "Company Departments", btnText: "Department", action: () => { setEditingEntityId(null); setDeptName(""); setDeptHead(""); setDeptStatus("Active"); setShowDeptModal(true); } };
+      case "teams":
+        return { title: "Human Teams", btnText: "Team", action: () => { setEditingEntityId(null); setTeamName(""); setTeamLead(""); setTeamStatus("Active"); setShowTeamModal(true); } };
+      case "swarms":
+        return { title: "Agent Swarms", btnText: "Swarm", action: () => { setEditingEntityId(null); setSwarmName(""); setSwarmLead(""); setSwarmStatus("Active"); setShowSwarmModal(true); } };
+      case "troops":
+        return { title: "Mixed Troops (Humans & Agents)", btnText: "Troop", action: () => { setEditingEntityId(null); setTroopName(""); setTroopLead(""); setTroopStatus("Active"); setShowTroopModal(true); } };
+      case "humans":
+        return { title: "Human Employees", btnText: "Human Staff", action: () => { setEditingEntityId(null); setHFirstName(""); setHLastName(""); setHRole(""); setHStatus("Active"); setShowHumanModal(true); } };
+      case "agents":
+        return { title: "Autonomous AI Agents", btnText: "Agent", action: () => { setEditingEntityId(null); setAName(""); setARole(""); setAStatus("Active"); setShowAgentModal(true); } };
+      default:
+        return null;
+    }
+  };
+
+  const tabHeader = getTabHeader();
 
   return (
     <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col p-4 md:p-6 overflow-hidden">
@@ -257,7 +399,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                   activeTab === "org" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
                 }`}
               >
-                Org Chart
+                Org
               </button>
               <button
                 onClick={() => setActiveTab("departments")}
@@ -268,36 +410,12 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                 Departments
               </button>
               <button
-                onClick={() => setActiveTab("teams")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "teams" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Teams (Humans)
-              </button>
-              <button
-                onClick={() => setActiveTab("swarms")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "swarms" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Swarms (Agents)
-              </button>
-              <button
-                onClick={() => setActiveTab("troops")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "troops" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Troops (Mixed)
-              </button>
-              <button
                 onClick={() => setActiveTab("humans")}
                 className={`px-3 py-1.5 rounded-lg transition ${
                   activeTab === "humans" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
                 }`}
               >
-                Humans ({humans.length})
+                Humans
               </button>
               <button
                 onClick={() => setActiveTab("agents")}
@@ -305,7 +423,31 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                   activeTab === "agents" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
                 }`}
               >
-                Agents ({agents.length})
+                Agents
+              </button>
+              <button
+                onClick={() => setActiveTab("teams")}
+                className={`px-3 py-1.5 rounded-lg transition ${
+                  activeTab === "teams" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Teams
+              </button>
+              <button
+                onClick={() => setActiveTab("swarms")}
+                className={`px-3 py-1.5 rounded-lg transition ${
+                  activeTab === "swarms" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Swarms
+              </button>
+              <button
+                onClick={() => setActiveTab("troops")}
+                className={`px-3 py-1.5 rounded-lg transition ${
+                  activeTab === "troops" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Troops
               </button>
             </div>
 
@@ -321,23 +463,57 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
 
         {/* Content Body */}
         <div className="flex-1 p-6 overflow-y-auto">
-          {activeTab === "org" && (
-            <div className="space-y-6 max-w-5xl mx-auto text-center">
-              <div className="p-4 bg-purple-950/20 border border-purple-500/30 rounded-2xl flex items-center justify-between">
-                <div className="text-left">
-                  <h3 className="font-bold text-slate-100 text-sm flex items-center gap-2">
-                    <Network className="w-4 h-4 text-purple-400" /> Interactive Drag & Drop Hierarchy
-                  </h3>
-                  <p className="text-xs text-slate-400">Rearrange reporting trees between executives, leads, and agent swarms</p>
-                </div>
+          {tabHeader && (
+            <div className="max-w-5xl mx-auto mb-6 flex justify-between items-center pb-2 border-b border-slate-800">
+              <div className="text-left">
+                <h3 className="font-bold text-slate-200 text-sm flex items-center gap-2">
+                  {tabHeader.icon} {tabHeader.title}
+                </h3>
+                {tabHeader.desc && <p className="text-xs text-slate-400 mt-0.5">{tabHeader.desc}</p>}
+              </div>
+              <div className="flex items-center gap-4">
+                {/* Filter & Sort Bar */}
+                {activeTab !== "org" && (
+                  <div className="flex items-center gap-4 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-slate-400">Status:</span>
+                      <select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                      >
+                        <option value="All">All</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Pending">Pending</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-slate-400">Sort By:</span>
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as any)}
+                        className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                      >
+                        <option value="name">Name</option>
+                        <option value="budget">Budget / Cost</option>
+                        <option value="headcount">Headcount</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
                 <button
-                  onClick={() => setShowOrgLinkModal(true)}
-                  className="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-purple-950/50"
+                  onClick={tabHeader.action}
+                  className="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg"
                 >
-                  <Plus className="w-4 h-4" /> Link Manager & Subordinate
+                  <Plus className="w-4 h-4" /> {tabHeader.btnText}
                 </button>
               </div>
+            </div>
+          )}
 
+          {activeTab === "org" && (
+            <div className="space-y-6 max-w-5xl mx-auto text-center">
               {/* Tree Mockup */}
               <div className="space-y-8 py-6">
                 <div className="inline-block bg-slate-950 border border-purple-500/50 p-4 rounded-2xl shadow-xl w-64">
@@ -373,49 +549,54 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
 
           {activeTab === "departments" && (
             <div className="space-y-4 max-w-5xl mx-auto">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="font-bold text-slate-200 text-sm">Company Departments</h3>
-                <button
-                  onClick={() => setShowDeptModal(true)}
-                  className="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg"
-                >
-                  <Plus className="w-4 h-4" /> + Add Department
-                </button>
-              </div>
-
               <div className="grid grid-cols-3 gap-4">
-                {departments.map((dept, idx) => {
+                {getFilteredAndSorted(departments).map((d: any, idx: number) => {
                   const deptId = idx === 0 ? "exec" : idx === 1 ? "engineering" : "ai_swarm";
                   return (
-                    <div key={idx} className={`border p-5 rounded-2xl space-y-3 ${dept.color}`}>
+                    <div key={d.id} onClick={() => setSelectedEntity({ ...d, _type: 'department' })} className={`border ${d.color} p-4 rounded-2xl flex flex-col cursor-pointer hover:ring-2 hover:ring-white/20 transition-all`}>
                       <h4 className="font-bold text-slate-100 text-base flex justify-between items-start">
-                        {dept.name}
+                        {d.name}
                         <span className="text-[10px] font-mono font-normal text-slate-400 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded-full">
-                          Budget: ${dept.budget.toLocaleString()}
+                          Budget: ${d.budget.toLocaleString()}
                         </span>
                       </h4>
-                      <p className="text-xs text-slate-400">Department Head: <strong className="text-slate-200">{dept.lead}</strong></p>
+                      <p className="text-xs text-slate-400">Department Head: <strong className="text-slate-200">{d.lead}</strong></p>
                       
                       {/* Financial Utilization */}
                       <div className="space-y-1 mt-2">
                         <div className="flex justify-between text-[10px] font-mono text-slate-400">
-                          <span>Spent: <span className="text-white">${dept.spent.toLocaleString()}</span></span>
-                          <span>{((dept.spent / dept.budget) * 100).toFixed(1)}%</span>
+                          <span>Spent: <span className="text-white">${d.spent.toLocaleString()}</span></span>
+                          <span>{((d.spent / d.budget) * 100).toFixed(1)}%</span>
                         </div>
                         <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
                           <div
-                            className={`h-full rounded-full transition-all duration-500 ${(dept.spent / dept.budget) >= 0.85 ? ((dept.spent / dept.budget) >= 1 ? 'bg-rose-500' : 'bg-amber-500') : 'bg-emerald-500'}`}
-                            style={{ width: `${Math.min((dept.spent / dept.budget) * 100, 100)}%` }}
+                            className={`h-full rounded-full transition-all duration-500 ${(d.spent / d.budget) >= 0.85 ? ((d.spent / d.budget) >= 1 ? 'bg-rose-500' : 'bg-amber-500') : 'bg-emerald-500'}`}
+                            style={{ width: `${Math.min((d.spent / d.budget) * 100, 100)}%` }}
                           />
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center pt-2 border-t border-slate-800/60 mt-3">
+                      <div className="flex justify-between items-center pt-2 border-t border-slate-800/60 mt-3" onClick={(e) => e.stopPropagation()}>
                         <span className="inline-block px-2.5 py-0.5 bg-slate-900 border border-slate-800 text-[10px] font-semibold rounded-xl text-slate-300">
-                          {dept.count}
+                          {d.count}
                         </span>
 
                         <div className="flex items-center space-x-1.5">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingEntityId(d.id);
+                              setDeptName(d.name);
+                              setDeptHead(d.lead);
+                              setDeptBudget((d.budget || 0).toString());
+                              setDeptStatus(d.status || "Active");
+                              setShowDeptModal(true);
+                            }}
+                            className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg"
+                            title="Edit Department"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
                           <button
                             onClick={() => openEntityBoard(deptId)}
                             className="p-1.5 bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/30 text-cyan-300 rounded-lg text-[10px] font-semibold transition flex items-center gap-1"
@@ -441,19 +622,9 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
 
           {activeTab === "teams" && (
             <div className="space-y-4 max-w-4xl mx-auto">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="font-bold text-slate-200 text-sm">Human Teams</h3>
-                <button
-                  onClick={() => setShowTeamModal(true)}
-                  className="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg"
-                >
-                  <Plus className="w-4 h-4" /> + Add Team
-                </button>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
-                {teams.map((t, idx) => (
-                  <div key={idx} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3">
+                {getFilteredAndSorted(teams).map((t: any) => (
+                  <div key={t.id} onClick={() => setSelectedEntity({ ...t, _type: 'team' })} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl cursor-pointer hover:border-purple-500/50 transition-colors space-y-3">
                     <div>
                       <h4 className="font-bold text-purple-300 text-base flex justify-between items-start">
                         {t.name}
@@ -474,7 +645,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2 border-t border-slate-800 mt-2">
+                    <div className="flex justify-between items-center pt-2 border-t border-slate-800 mt-2" onClick={(e) => e.stopPropagation()}>
                       <span className="inline-block px-2.5 py-0.5 bg-slate-900 text-xs font-mono text-purple-400 rounded-lg border border-purple-500/20">
                         {t.members}
                       </span>
@@ -502,19 +673,9 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
 
           {activeTab === "swarms" && (
             <div className="space-y-4 max-w-4xl mx-auto">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="font-bold text-slate-200 text-sm">Agent Swarms</h3>
-                <button
-                  onClick={() => setShowSwarmModal(true)}
-                  className="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg"
-                >
-                  <Plus className="w-4 h-4" /> + Add Swarm
-                </button>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
-                {swarms.map((s, idx) => (
-                  <div key={idx} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3">
+                {getFilteredAndSorted(swarms).map((s: any) => (
+                  <div key={s.id} onClick={() => setSelectedEntity({ ...s, _type: 'swarm' })} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl cursor-pointer hover:border-cyan-500/50 transition-colors space-y-3">
                     <div>
                       <h4 className="font-bold text-cyan-300 text-base flex justify-between items-start">
                         {s.name}
@@ -535,7 +696,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2 border-t border-slate-800 mt-2">
+                    <div className="flex justify-between items-center pt-2 border-t border-slate-800 mt-2" onClick={(e) => e.stopPropagation()}>
                       <span className="inline-block px-2.5 py-0.5 bg-slate-900 text-xs font-mono text-cyan-400 rounded-lg border border-cyan-500/20">
                         {s.members}
                       </span>
@@ -563,19 +724,9 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
 
           {activeTab === "troops" && (
             <div className="space-y-4 max-w-4xl mx-auto">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="font-bold text-slate-200 text-sm">Mixed Troops (Humans & Agents)</h3>
-                <button
-                  onClick={() => setShowTroopModal(true)}
-                  className="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg"
-                >
-                  <Plus className="w-4 h-4" /> + Add Troop
-                </button>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
-                {troops.map((tr, idx) => (
-                  <div key={idx} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3">
+                {getFilteredAndSorted(troops).map((tr: any) => (
+                  <div key={tr.id} onClick={() => setSelectedEntity({ ...tr, _type: 'troop' })} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl cursor-pointer hover:border-amber-500/50 transition-colors space-y-3">
                     <div>
                       <h4 className="font-bold text-amber-300 text-base flex justify-between items-start">
                         {tr.name}
@@ -624,19 +775,9 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
 
           {activeTab === "humans" && (
             <div className="space-y-4 max-w-4xl mx-auto">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="font-bold text-slate-200 text-sm">Human Employees</h3>
-                <button
-                  onClick={() => setShowHumanModal(true)}
-                  className="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg"
-                >
-                  <Plus className="w-4 h-4" /> + Add Human Staff
-                </button>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
                 {humans.map((h) => (
-                  <div key={h.id} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+                  <div key={h.id} onClick={() => setSelectedEntity({ ...h, _type: 'human' })} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center justify-between cursor-pointer hover:border-purple-500/50 transition-colors">
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-xl">
                         👤
@@ -655,12 +796,31 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                       </div>
                     </div>
                     
-                    <button
-                      onClick={() => openLinkModal(h.id, "human", h.name)}
-                      className="px-3 py-1.5 bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
-                    >
-                      <Link2 className="w-3.5 h-3.5" /> Link
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingEntityId(h.id);
+                          const names = h.name.split(" ");
+                          setHFirstName(names[0]);
+                          setHLastName(names.slice(1).join(" "));
+                          setHRole(h.role || "");
+                          setHSalary((h.annualSalary || 0).toString());
+                          setHStatus(h.status || "Active");
+                          setShowHumanModal(true);
+                        }}
+                        className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg"
+                        title="Edit Human"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); openLinkModal(h.id, "human", h.name); }}
+                        className="px-3 py-1.5 bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
+                      >
+                        <Link2 className="w-3.5 h-3.5" /> Link
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -669,19 +829,9 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
 
           {activeTab === "agents" && (
             <div className="space-y-4 max-w-4xl mx-auto">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="font-bold text-slate-200 text-sm">Autonomous AI Agents</h3>
-                <button
-                  onClick={() => setShowAgentModal(true)}
-                  className="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg"
-                >
-                  <Plus className="w-4 h-4" /> + Add Agent
-                </button>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
                 {agents.map((a) => (
-                  <div key={a.id} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+                  <div key={a.id} onClick={() => setSelectedEntity({ ...a, _type: 'agent' })} className="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center justify-between cursor-pointer hover:border-cyan-500/50 transition-colors">
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 border border-cyan-500/40 flex items-center justify-center text-xl">
                         🤖
@@ -700,12 +850,29 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => openLinkModal(a.id, "agent", a.name)}
-                      className="px-3 py-1.5 bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
-                    >
-                      <Link2 className="w-3.5 h-3.5" /> Link
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingEntityId(a.id);
+                          setAName(a.name);
+                          setARole(a.role || "");
+                          setACost((a.monthlyCost || 0).toString());
+                          setAStatus(a.status || "Active");
+                          setShowAgentModal(true);
+                        }}
+                        className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg"
+                        title="Edit Agent"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); openLinkModal(a.id, "agent", a.name); }}
+                        className="px-3 py-1.5 bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
+                      >
+                        <Link2 className="w-3.5 h-3.5" /> Link
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -871,6 +1038,20 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                   </div>
                 </div>
 
+
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Status</label>
+                  <select
+                    value={hStatus}
+                    onChange={(e) => setHStatus(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+
                 <div className="flex justify-end space-x-2 pt-2">
                   <button type="button" onClick={() => setShowHumanModal(false)} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-medium">
                     Cancel
@@ -958,6 +1139,19 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                   </div>
                 </div>
 
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Status</label>
+                  <select
+                    value={aStatus}
+                    onChange={(e) => setAStatus(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+
                 <div className="flex justify-end space-x-2 pt-2">
                   <button type="button" onClick={() => setShowAgentModal(false)} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-medium">
                     Cancel
@@ -967,6 +1161,347 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+        {/* 3. Add Dept Modal */}
+        {showDeptModal && (
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-[#0f172a] border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 className="font-bold text-base text-white flex items-center gap-2">
+                  <Layers className="w-5 h-5 text-purple-400" /> Create Department
+                </h3>
+                <button onClick={() => setShowDeptModal(false)} className="text-slate-400 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <form onSubmit={handleAddDept} className="space-y-3.5 text-xs">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Department Name</label>
+                  <input type="text" required value={deptName} onChange={(e) => setDeptName(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-purple-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Department Head</label>
+                  <input type="text" value={deptHead} onChange={(e) => setDeptHead(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-purple-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Annual Budget</label>
+                  <input type="number" required value={deptBudget} onChange={(e) => setDeptBudget(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-purple-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Status</label>
+                  <select
+                    value={deptStatus}
+                    onChange={(e) => setDeptStatus(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+                <div className="flex justify-end space-x-2 pt-2">
+                  <button type="button" onClick={() => setShowDeptModal(false)} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-medium">Cancel</button>
+                  <button type="submit" className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl shadow-lg">Create Department</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 4. Add Team Modal */}
+        {showTeamModal && (
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-[#0f172a] border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 className="font-bold text-base text-white flex items-center gap-2">
+                  <Users className="w-5 h-5 text-purple-400" /> Create Team
+                </h3>
+                <button onClick={() => setShowTeamModal(false)} className="text-slate-400 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <form onSubmit={handleAddTeam} className="space-y-3.5 text-xs">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Team Name</label>
+                  <input type="text" required value={teamName} onChange={(e) => setTeamName(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-purple-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Team Lead</label>
+                  <input type="text" value={teamLead} onChange={(e) => setTeamLead(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-purple-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Annual Budget</label>
+                  <input type="number" required value={teamBudget} onChange={(e) => setTeamBudget(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-purple-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Status</label>
+                  <select
+                    value={teamStatus}
+                    onChange={(e) => setTeamStatus(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+                <div className="flex justify-end space-x-2 pt-2">
+                  <button type="button" onClick={() => setShowTeamModal(false)} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-medium">Cancel</button>
+                  <button type="submit" className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl shadow-lg">Create Team</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 5. Add Swarm Modal */}
+        {showSwarmModal && (
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-[#0f172a] border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 className="font-bold text-base text-white flex items-center gap-2">
+                  <Bot className="w-5 h-5 text-cyan-400" /> Create Agent Swarm
+                </h3>
+                <button onClick={() => setShowSwarmModal(false)} className="text-slate-400 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <form onSubmit={handleAddSwarm} className="space-y-3.5 text-xs">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Swarm Name</label>
+                  <input type="text" required value={swarmName} onChange={(e) => setSwarmName(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-cyan-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Swarm Lead / Orchestrator</label>
+                  <input type="text" value={swarmLead} onChange={(e) => setSwarmLead(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-cyan-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Monthly API Budget</label>
+                  <input type="number" required value={swarmBudget} onChange={(e) => setSwarmBudget(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-cyan-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Status</label>
+                  <select
+                    value={swarmStatus}
+                    onChange={(e) => setSwarmStatus(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+                <div className="flex justify-end space-x-2 pt-2">
+                  <button type="button" onClick={() => setShowSwarmModal(false)} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-medium">Cancel</button>
+                  <button type="submit" className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold rounded-xl shadow-lg">Create Swarm</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 6. Add Troop Modal */}
+        {showTroopModal && (
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-[#0f172a] border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 className="font-bold text-base text-white flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-amber-400" /> Create Mixed Troop
+                </h3>
+                <button onClick={() => setShowTroopModal(false)} className="text-slate-400 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <form onSubmit={handleAddTroop} className="space-y-3.5 text-xs">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Troop Name</label>
+                  <input type="text" required value={troopName} onChange={(e) => setTroopName(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Troop Commander (Lead)</label>
+                  <input type="text" value={troopLead} onChange={(e) => setTroopLead(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Annual Budget</label>
+                  <input type="number" required value={troopBudget} onChange={(e) => setTroopBudget(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-500" />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Status</label>
+                  <select
+                    value={troopStatus}
+                    onChange={(e) => setTroopStatus(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-500"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+                <div className="flex justify-end space-x-2 pt-2">
+                  <button type="button" onClick={() => setShowTroopModal(false)} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-medium">Cancel</button>
+                  <button type="submit" className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-xl shadow-lg">Create Troop</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Entity Detail Modal */}
+        {selectedEntity && (
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-[#0f172a] border border-slate-800 rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col p-6 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4 shrink-0">
+                <h3 className="font-bold text-lg text-white capitalize">{selectedEntity.name}</h3>
+                <button onClick={() => setSelectedEntity(null)} className="text-slate-400 hover:text-white">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="space-y-5 text-sm text-slate-300 overflow-y-auto pr-2 pb-2">
+                <div className="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <span className="font-semibold text-slate-400 uppercase text-xs">Entity Type</span>
+                  <span className="bg-purple-900/40 text-purple-300 px-2 py-1 rounded border border-purple-500/30 text-xs uppercase font-bold">
+                    {selectedEntity._type}
+                  </span>
+                </div>
+
+                {selectedEntity.desc && (
+                  <div>
+                    <span className="block font-semibold text-slate-400 mb-1 text-xs uppercase">Description</span>
+                    <p className="bg-slate-900 p-3 rounded-lg border border-slate-800">{selectedEntity.desc}</p>
+                  </div>
+                )}
+                
+                {/* Single line properties block */}
+                <div className="grid grid-cols-2 gap-4">
+                  {selectedEntity.role && (
+                    <div>
+                      <span className="block font-semibold text-slate-400 mb-1 text-xs uppercase">Role</span>
+                      <p className="bg-slate-900 p-3 rounded-lg border border-slate-800 truncate">{selectedEntity.role}</p>
+                    </div>
+                  )}
+
+                  {selectedEntity.lead && (
+                    <div>
+                      <span className="block font-semibold text-slate-400 mb-1 text-xs uppercase">Lead / Manager</span>
+                      <p className="bg-slate-900 p-3 rounded-lg border border-slate-800 truncate">{selectedEntity.lead}</p>
+                    </div>
+                  )}
+
+                  {(selectedEntity.count || selectedEntity.members) && (
+                    <div>
+                      <span className="block font-semibold text-slate-400 mb-1 text-xs uppercase">Headcount</span>
+                      <p className="bg-slate-900 p-3 rounded-lg border border-slate-800 truncate">{selectedEntity.count || selectedEntity.members}</p>
+                    </div>
+                  )}
+
+                  {(selectedEntity.annualSalary !== undefined || selectedEntity.monthlyCost !== undefined) && (
+                    <div>
+                      <span className="block font-semibold text-slate-400 mb-1 text-xs uppercase">Cost</span>
+                      <p className="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-emerald-400 truncate">
+                        ${(selectedEntity.annualSalary || selectedEntity.monthlyCost).toLocaleString()} / {selectedEntity.annualSalary ? 'yr' : 'mo'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {selectedEntity.budget !== undefined && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="block font-semibold text-slate-400 mb-1 text-xs uppercase">Budget</span>
+                      <p className="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-emerald-400">${selectedEntity.budget.toLocaleString()}</p>
+                    </div>
+                    {selectedEntity.spent !== undefined && (
+                      <div>
+                        <span className="block font-semibold text-slate-400 mb-1 text-xs uppercase">Spent</span>
+                        <p className="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-amber-400">${selectedEntity.spent.toLocaleString()}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Dynamic Arrays */}
+                {selectedEntity.targets && selectedEntity.targets.length > 0 && (
+                  <div>
+                    <span className="block font-semibold text-slate-400 mb-2 text-xs uppercase">Targets</span>
+                    <ul className="space-y-1.5">
+                      {selectedEntity.targets.map((t: string, idx: number) => (
+                        <li key={idx} className="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-slate-300 text-sm flex items-center gap-2">
+                          <Target className="w-4 h-4 text-rose-500 shrink-0" /> {t}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {selectedEntity.projects && selectedEntity.projects.length > 0 && (
+                  <div>
+                    <span className="block font-semibold text-slate-400 mb-2 text-xs uppercase">Projects</span>
+                    <ul className="space-y-1.5">
+                      {selectedEntity.projects.map((p: string, idx: number) => (
+                        <li key={idx} className="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-slate-300 text-sm flex items-center gap-2">
+                          <Folder className="w-4 h-4 text-cyan-500 shrink-0" /> {p}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {selectedEntity.tasks && selectedEntity.tasks.length > 0 && (
+                  <div>
+                    <span className="block font-semibold text-slate-400 mb-2 text-xs uppercase">Current Tasks</span>
+                    <ul className="space-y-1.5">
+                      {selectedEntity.tasks.map((t: string, idx: number) => (
+                        <li key={idx} className="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-slate-300 text-sm flex items-center gap-2">
+                          <CheckSquare className="w-4 h-4 text-emerald-500 shrink-0" /> {t}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {selectedEntity.routines && selectedEntity.routines.length > 0 && (
+                  <div>
+                    <span className="block font-semibold text-slate-400 mb-2 text-xs uppercase">Routines</span>
+                    <ul className="space-y-1.5">
+                      {selectedEntity.routines.map((r: string, idx: number) => (
+                        <li key={idx} className="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-slate-300 text-sm flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-amber-500 shrink-0" /> {r}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {selectedEntity.skills && selectedEntity.skills.length > 0 && (
+                  <div>
+                    <span className="block font-semibold text-slate-400 mb-2 text-xs uppercase">Skills</span>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedEntity.skills.map((s: string, idx: number) => (
+                        <span key={idx} className="bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800 text-slate-300 text-sm flex items-center gap-1.5">
+                          <Zap className="w-3.5 h-3.5 text-purple-500" /> {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedEntity.artifacts && selectedEntity.artifacts.length > 0 && (
+                  <div>
+                    <span className="block font-semibold text-slate-400 mb-2 text-xs uppercase">Artifacts</span>
+                    <ul className="space-y-1.5">
+                      {selectedEntity.artifacts.map((a: string, idx: number) => (
+                        <li key={idx} className="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-slate-300 text-sm flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-sky-500 shrink-0" /> {a}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+              </div>
             </div>
           </div>
         )}

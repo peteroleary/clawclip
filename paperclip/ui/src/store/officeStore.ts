@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { FacilityItem, initialFacilities } from "../features/office/screens/FacilitiesImmersiveScreen";
 
 export const CLASSROOM_NODES: [number, number, number][] = [
-  [-4, 0.75, -3], [-4, 0.75, 0], [-4, 0.75, 3], // Eng Desks
-  [4, 0.75, -3], [4, 0.75, 0], [4, 0.75, 3], // AI Desks
+  [-4, 0.75, -4], [-4, 0.75, -1], [-4, 0.75, 2], // Eng Desks (Offset from table centers)
+  [4, 0.75, -4], [4, 0.75, -1], [4, 0.75, 2], // AI Desks (Offset from table centers)
   [-1.5, 0.75, -6.5], [1.5, 0.75, -6.5], // Standup area
   [-2, 0.75, 5.5], [2, 0.75, 5.5], // Lounge area
   [0, 0.75, -8], // Whiteboard presentation
