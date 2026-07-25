@@ -17,6 +17,7 @@ import {
   Send,
 } from "lucide-react";
 import type { Workforce3DMember } from "../types.js";
+import { useOfficeStore } from "../../../store/officeStore.js";
 
 export type IssueStatus =
   | "triage"
@@ -112,6 +113,33 @@ const initialBoards: BoardConfig[] = [
     ],
   },
   {
+    id: "proj_clawclip",
+    name: "ClawClip 3D Office Platform",
+    feedsInto: "master",
+    columns: [
+      { id: "triage", label: "Backlog", color: "border-slate-800 bg-slate-900/40" },
+      { id: "running", label: "In Progress", color: "border-blue-500/30 bg-blue-950/20" },
+      { id: "review", label: "QA & Testing", color: "border-purple-500/30 bg-purple-950/20" },
+      { id: "done", label: "Shipped", color: "border-emerald-500/30 bg-emerald-950/20" },
+    ],
+  },
+  {
+    id: "proj_atm",
+    name: "ATM Treasury & Cost System",
+    feedsInto: "master",
+    columns: [
+      { id: "todo", label: "To Do", color: "border-slate-700 bg-slate-900/60" },
+      { id: "running", label: "Auditing", color: "border-blue-500/30 bg-blue-950/20" },
+      { id: "done", label: "Verified", color: "border-emerald-500/30 bg-emerald-950/20" },
+    ],
+  },
+  {
+    id: "team_squad",
+    name: "Core Product Squad",
+    feedsInto: "master",
+    columns: defaultColumns,
+  },
+  {
     id: "social_media",
     name: "Social Media Campaign",
     feedsInto: "master",
@@ -144,8 +172,17 @@ export const KanbanImmersiveScreen: React.FC<KanbanImmersiveScreenProps> = ({
   initialCreateMode = false,
   workforce = [],
 }) => {
+  const focusedBoardId = useOfficeStore((state) => state.focusedBoardId);
+  const openEntityChat = useOfficeStore((state) => state.openEntityChat);
+
   const [boards, setBoards] = useState<BoardConfig[]>(initialBoards);
-  const [activeBoardId, setActiveBoardId] = useState<string>("master");
+  const [activeBoardId, setActiveBoardId] = useState<string>(focusedBoardId || "master");
+
+  useEffect(() => {
+    if (focusedBoardId) {
+      setActiveBoardId(focusedBoardId);
+    }
+  }, [focusedBoardId]);
   const [showBoardDropdown, setShowBoardDropdown] = useState(false);
 
   const currentBoard = boards.find((b) => b.id === activeBoardId) || boards[0];
@@ -474,6 +511,28 @@ export const KanbanImmersiveScreen: React.FC<KanbanImmersiveScreenProps> = ({
           </div>
 
           <div className="flex items-center space-x-3">
+            <button
+              onClick={() => {
+                const channelId = activeBoardId === "proj_clawclip"
+                  ? "proj-clawclip"
+                  : activeBoardId === "proj_atm"
+                  ? "proj-atm-treasury"
+                  : activeBoardId === "engineering"
+                  ? "dept-engineering"
+                  : activeBoardId === "ai_swarm"
+                  ? "dept-swarms"
+                  : activeBoardId === "team_squad"
+                  ? "team-core-squad"
+                  : "general";
+                openEntityChat(channelId);
+              }}
+              className="flex items-center space-x-1.5 px-3 py-2 bg-purple-950/60 hover:bg-purple-900 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-semibold transition"
+              title="Open linked entity Group Chat channel"
+            >
+              <MessageSquare className="w-4 h-4 text-purple-400" />
+              <span>Open Group Chat</span>
+            </button>
+
             <button
               onClick={() => setShowNewBoardModal(true)}
               className="flex items-center space-x-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700 transition"

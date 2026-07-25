@@ -13,6 +13,17 @@ import { Sparkles } from "lucide-react";
 import { useOfficeStore, OfficeEntity } from "../store/officeStore.js";
 
 import { KanbanImmersiveScreen } from "../features/office/screens/KanbanImmersiveScreen.js";
+import { SchedulingImmersiveScreen } from "../features/office/screens/SchedulingImmersiveScreen.js";
+import { TeamImmersiveScreen } from "../features/office/screens/TeamImmersiveScreen.js";
+import { DiscoverImmersiveScreen } from "../features/office/screens/DiscoverImmersiveScreen.js";
+import { ProjectsImmersiveScreen } from "../features/office/screens/ProjectsImmersiveScreen.js";
+import { MemoryImmersiveScreen } from "../features/office/screens/MemoryImmersiveScreen.js";
+import { ArtifactsImmersiveScreen } from "../features/office/screens/ArtifactsImmersiveScreen.js";
+import { WalletImmersiveScreen } from "../features/office/screens/WalletImmersiveScreen.js";
+import { CommsImmersiveScreen } from "../features/office/screens/CommsImmersiveScreen.js";
+import { TargetsImmersiveScreen } from "../features/office/screens/TargetsImmersiveScreen.js";
+import { DirectoryImmersiveScreen } from "../features/office/screens/DirectoryImmersiveScreen.js";
+import { FacilitiesImmersiveScreen } from "../features/office/screens/FacilitiesImmersiveScreen.js";
 
 export const OfficePage: React.FC = () => {
   const { companyId } = useParams<{ companyId: string }>();
@@ -122,19 +133,93 @@ export const OfficePage: React.FC = () => {
         )}
       </div>
 
-      {/* Floating Bottom Action Dock: Board | + | Routines */}
+      {/* Floating Bottom Action Dock: Wallet | Team, Targets, Projects, Board, Scheduling, Facilities, Directory, Memory, Artifacts | Comms */}
       <BottomActionDock
+        onOpenWallet={() => setActiveDrawer("bottom", "wallet")}
+        onOpenTeam={() => setActiveDrawer("bottom", "team")}
+        onOpenTargets={() => setActiveDrawer("bottom", "targets")}
+        onOpenProjects={() => setActiveDrawer("bottom", "projects")}
         onOpenBoard={() => setActiveDrawer("bottom", "board")}
-        onOpenCreateMenu={() => setActiveDrawer("bottom", "create")}
-        onOpenRoutines={() => setActiveDrawer("bottom", "routines")}
+        onOpenScheduling={() => setActiveDrawer("bottom", "scheduling")}
+        onOpenFacilities={() => setActiveDrawer("bottom", "facilities")}
+        onOpenDirectory={() => setActiveDrawer("bottom", "directory")}
+        onOpenMemory={() => setActiveDrawer("bottom", "memory")}
+        onOpenArtifacts={() => setActiveDrawer("bottom", "artifacts")}
+        onOpenComms={() => setActiveDrawer("bottom", "comms")}
       />
 
-      {/* Full-Screen Immersive Kanban Board Screen */}
+      {/* 1. Full-Screen Immersive Wallet & Treasury Screen */}
+      <WalletImmersiveScreen
+        isOpen={activePanels.bottom === "wallet"}
+        onClose={() => setActiveDrawer("bottom", null)}
+      />
+
+      {/* 2. Full-Screen Immersive Team & Org Chart Screen */}
+      <TeamImmersiveScreen
+        isOpen={activePanels.bottom === "team"}
+        onClose={() => setActiveDrawer("bottom", null)}
+        workforce={workforce}
+      />
+
+      {/* 3. Full-Screen Immersive Targets & KPIs Screen */}
+      <TargetsImmersiveScreen
+        isOpen={activePanels.bottom === "targets"}
+        onClose={() => setActiveDrawer("bottom", null)}
+        workforce={workforce}
+      />
+
+      {/* 4. Full-Screen Immersive Projects Screen */}
+      <ProjectsImmersiveScreen
+        isOpen={activePanels.bottom === "projects"}
+        onClose={() => setActiveDrawer("bottom", null)}
+        workforce={workforce}
+      />
+
+      {/* 5. Full-Screen Immersive Kanban Board Screen */}
       <KanbanImmersiveScreen
         isOpen={activePanels.bottom === "board"}
         onClose={() => setActiveDrawer("bottom", null)}
         companyId={companyId}
         initialCreateMode={initialNewTask}
+        workforce={workforce}
+      />
+
+      {/* 6. Full-Screen Immersive Scheduling Screen */}
+      <SchedulingImmersiveScreen
+        isOpen={activePanels.bottom === "scheduling"}
+        onClose={() => setActiveDrawer("bottom", null)}
+        workforce={workforce}
+      />
+
+      {/* 7. Full-Screen Immersive Facilities & Spatial Screen */}
+      <FacilitiesImmersiveScreen
+        isOpen={activePanels.bottom === "facilities"}
+        onClose={() => setActiveDrawer("bottom", null)}
+      />
+
+      {/* 8. Full-Screen Immersive Universal Directory Screen */}
+      <DirectoryImmersiveScreen
+        isOpen={activePanels.bottom === "directory"}
+        onClose={() => setActiveDrawer("bottom", null)}
+      />
+
+      {/* 9. Full-Screen Immersive Memory Screen */}
+      <MemoryImmersiveScreen
+        isOpen={activePanels.bottom === "memory"}
+        onClose={() => setActiveDrawer("bottom", null)}
+        workforce={workforce}
+      />
+
+      {/* 10. Full-Screen Immersive Artifacts Screen */}
+      <ArtifactsImmersiveScreen
+        isOpen={activePanels.bottom === "artifacts"}
+        onClose={() => setActiveDrawer("bottom", null)}
+      />
+
+      {/* 11. Full-Screen Immersive Comms Screen */}
+      <CommsImmersiveScreen
+        isOpen={activePanels.bottom === "comms"}
+        onClose={() => setActiveDrawer("bottom", null)}
         workforce={workforce}
       />
     </div>

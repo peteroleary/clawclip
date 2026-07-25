@@ -16,11 +16,17 @@ interface OfficeState {
   activePanels: {
     top: boolean;
     bottom: string | null;
-    left: string | null; // e.g. "projects", "facilities", "directory", "offers"
-    right: string | null; // e.g. "hq", "chat", "marketplace", "orgchart"
+    left: string | null;
+    right: string | null;
   };
   setPanelState: (panel: "top", isOpen: boolean) => void;
   setActiveDrawer: (side: "left" | "right" | "bottom", drawerId: string | null) => void;
+
+  // Interlinked Navigation State
+  focusedBoardId?: string;
+  focusedChannelId?: string;
+  openEntityBoard: (boardId: string) => void;
+  openEntityChat: (channelId: string) => void;
 
   // Selection & 3D Sync State
   selectedEntity: OfficeEntity | null;
@@ -44,6 +50,19 @@ export const useOfficeStore = create<OfficeState>((set) => ({
   setActiveDrawer: (side, drawerId) =>
     set((state) => ({
       activePanels: { ...state.activePanels, [side]: drawerId },
+    })),
+
+  focusedBoardId: "master",
+  focusedChannelId: "general",
+  openEntityBoard: (boardId) =>
+    set((state) => ({
+      focusedBoardId: boardId,
+      activePanels: { ...state.activePanels, bottom: "board" },
+    })),
+  openEntityChat: (channelId) =>
+    set((state) => ({
+      focusedChannelId: channelId,
+      activePanels: { ...state.activePanels, bottom: "comms" },
     })),
 
   selectedEntity: null,
