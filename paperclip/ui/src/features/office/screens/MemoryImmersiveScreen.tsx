@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { X, Brain, Key, FileText, Plus, Lock, ShieldCheck, Database, Search } from "lucide-react";
+import { X, Brain, Key, FileText, Plus, Lock, ShieldCheck, Database, Search, Network } from "lucide-react";
+import ForceGraph3D from "react-force-graph-3d";
+import { supabase } from "../../../lib/supabaseClient.js";
 import type { Workforce3DMember } from "../types.js";
 
 interface MemoryImmersiveScreenProps {
@@ -13,7 +15,9 @@ export const MemoryImmersiveScreen: React.FC<MemoryImmersiveScreenProps> = ({
   onClose,
   workforce = [],
 }) => {
-  const [activeTab, setActiveTab] = useState<"memories" | "notes" | "providers">("memories");
+  const [activeTab, setActiveTab] = useState<"memories" | "notes" | "providers" | "graph">("memories");
+  const [graphData, setGraphData] = useState({ nodes: [], links: [] });
+  const [loadingGraph, setLoadingGraph] = useState(false);
 
   // Modals state
   const [showMemModal, setShowMemModal] = useState(false);
@@ -55,6 +59,41 @@ export const MemoryImmersiveScreen: React.FC<MemoryImmersiveScreenProps> = ({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, showMemModal, showNoteModal, onClose]);
+
+  // Fetch Graph Data
+  useEffect(() => {
+    if (activeTab === "graph" && graphData.nodes.length === 0 && !loadingGraph) {
+      setLoadingGraph(true);
+      const fetchGraph = async () => {
+        try {
+          const { data: nodesData } = await supabase.from('nodes').select('*');
+          const { data: edgesData } = await supabase.from('edges').select('*');
+          
+          if (nodesData && edgesData) {
+            setGraphData({
+              nodes: nodesData.map((n: any) => ({
+                id: n.id,
+                name: n.name,
+                type: n.type,
+                val: 1.5,
+                color: n.type === 'human' ? '#a855f7' : n.type === 'agent' ? '#ec4899' : n.type === 'project' ? '#3b82f6' : '#f59e0b'
+              })),
+              links: edgesData.map((e: any) => ({
+                source: e.source_id,
+                target: e.target_id,
+                name: e.relationship_type
+              }))
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching graph data:", error);
+        } finally {
+          setLoadingGraph(false);
+        }
+      };
+      fetchGraph();
+    }
+  }, [activeTab]);
 
   if (!isOpen) return null;
 
@@ -138,6 +177,14 @@ export const MemoryImmersiveScreen: React.FC<MemoryImmersiveScreenProps> = ({
               >
                 Providers & Keys
               </button>
+              <button
+                onClick={() => setActiveTab("graph")}
+                className={`px-3 py-1.5 rounded-lg transition ${
+                  activeTab === "graph" ? "bg-pink-500/20 text-pink-300 border border-pink-500/30 font-bold" : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Entity Graph
+              </button>
             </div>
 
             <button
@@ -151,7 +198,7 @@ export const MemoryImmersiveScreen: React.FC<MemoryImmersiveScreenProps> = ({
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 p-6 overflow-y-auto">
+        <div className={`flex-1 overflow-y-auto ${activeTab === 'graph' ? 'overflow-hidden' : 'p-6'}`}>
           {activeTab === "memories" && (
             <div className="space-y-4 max-w-4xl mx-auto">
               <div className="flex justify-between items-center pb-2 border-b border-slate-800">
@@ -226,6 +273,26 @@ export const MemoryImmersiveScreen: React.FC<MemoryImmersiveScreenProps> = ({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {activeTab === "graph" && (
+            <div className="w-full h-full relative">
+              {loadingGraph && (
+                <div className="absolute inset-0 flex items-center justify-center text-pink-400">
+                  Loading Graph Nodes...
+                </div>
+              )}
+              {!loadingGraph && (
+                <ForceGraph3D
+                  graphData={graphData}
+                  nodeLabel="name"
+                  nodeColor="color"
+                  linkDirectionalArrowLength={3.5}
+                  linkDirectionalArrowRelPos={1}
+                  backgroundColor="#06090d"
+                />
+              )}
             </div>
           )}
         </div>
