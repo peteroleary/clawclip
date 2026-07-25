@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import type { Workforce3DMember } from "../types.js";
 
-export type HQSidebarTab = "inbox" | "history" | "kanban" | "playbooks" | "analytics";
+export type HQSidebarTab = "artifacts" | "skills" | "playbooks" | "stats" | "activity" | "settings";
 
 interface HQSidebarProps {
   open: boolean;
@@ -34,13 +34,13 @@ export const HQSidebar: React.FC<HQSidebarProps> = ({
   onAddAgent,
   workforce,
 }) => {
-  const [activeTab, setActiveTab] = useState<HQSidebarTab>("inbox");
+  const [activeTab, setActiveTab] = useState<HQSidebarTab>("activity");
 
   const humanCount = workforce.filter((m) => m.type === "human").length;
   const agentCount = workforce.filter((m) => m.type === "agent").length;
 
   return (
-    <aside className="pointer-events-none fixed inset-y-0 right-0 z-30 flex justify-end">
+    <aside className="pointer-events-none fixed inset-y-0 right-0 z-30 flex justify-end select-none">
       <div className="pointer-events-auto mt-16 flex shrink-0 flex-row items-start">
         {/* Toggle & Quick Action Buttons */}
         <div className="flex flex-col gap-2 mr-2">
@@ -74,18 +74,16 @@ export const HQSidebar: React.FC<HQSidebarProps> = ({
             <div className="p-4 border-b border-slate-800 bg-[#06090d]">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-bold text-cyan-400 tracking-wide uppercase flex items-center gap-2">
-                  <span>🏢</span> Headquarters Control
+                  <span>🏢</span> Platform HQ
                 </h3>
                 <div className="flex items-center space-x-1.5">
                   <button
-                    onClick={() => {
-                      setActiveTab("kanban");
-                    }}
-                    className="p-1.5 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
-                    title="Dispatch New Task"
+                    onClick={onOpenMarketplace}
+                    className="p-1.5 bg-fuchsia-950/80 hover:bg-fuchsia-900 border border-fuchsia-500/40 text-fuchsia-300 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+                    title="Platform Marketplace"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>New Task</span>
+                    <span>Store</span>
                   </button>
                   <button
                     onClick={onAddHuman}
@@ -95,118 +93,86 @@ export const HQSidebar: React.FC<HQSidebarProps> = ({
                     <UserPlus className="w-3.5 h-3.5" />
                     <span>Staff</span>
                   </button>
-                  <button
-                    onClick={onAddAgent}
-                    className="p-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-500/40 text-blue-300 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
-                    title="Add AI Agent"
-                  >
-                    <Bot className="w-3.5 h-3.5" />
-                    <span>Agent</span>
-                  </button>
                 </div>
               </div>
 
-              {/* Tab Selector */}
-              <div className="grid grid-cols-5 gap-1 bg-[#0f172a] p-1 rounded-xl border border-slate-800 text-[11px] font-medium text-slate-400">
+              {/* Tab Selector: Platform Tabs */}
+              <div className="grid grid-cols-6 gap-1 bg-[#0f172a] p-1 rounded-xl border border-slate-800 text-[10px] font-medium text-slate-400">
                 <button
-                  onClick={() => setActiveTab("inbox")}
-                  className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition ${
-                    activeTab === "inbox" ? "bg-cyan-600 text-white font-bold" : "hover:text-white"
+                  onClick={() => setActiveTab("artifacts")}
+                  className={`py-1 rounded-md flex items-center justify-center transition ${
+                    activeTab === "artifacts" ? "bg-cyan-600 text-white font-bold" : "hover:text-white"
                   }`}
                 >
-                  <Inbox className="w-3 h-3" />
-                  <span>Inbox</span>
+                  Artifacts
                 </button>
                 <button
-                  onClick={() => setActiveTab("history")}
-                  className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition ${
-                    activeTab === "history" ? "bg-cyan-600 text-white font-bold" : "hover:text-white"
+                  onClick={() => setActiveTab("skills")}
+                  className={`py-1 rounded-md flex items-center justify-center transition ${
+                    activeTab === "skills" ? "bg-cyan-600 text-white font-bold" : "hover:text-white"
                   }`}
                 >
-                  <History className="w-3 h-3" />
-                  <span>History</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab("kanban")}
-                  className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition ${
-                    activeTab === "kanban" ? "bg-cyan-600 text-white font-bold" : "hover:text-white"
-                  }`}
-                >
-                  <Kanban className="w-3 h-3" />
-                  <span>Board</span>
+                  Skills
                 </button>
                 <button
                   onClick={() => setActiveTab("playbooks")}
-                  className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition ${
+                  className={`py-1 rounded-md flex items-center justify-center transition ${
                     activeTab === "playbooks" ? "bg-cyan-600 text-white font-bold" : "hover:text-white"
                   }`}
                 >
-                  <BookOpen className="w-3 h-3" />
-                  <span>Play</span>
+                  Plays
                 </button>
                 <button
-                  onClick={() => setActiveTab("analytics")}
-                  className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition ${
-                    activeTab === "analytics" ? "bg-cyan-600 text-white font-bold" : "hover:text-white"
+                  onClick={() => setActiveTab("stats")}
+                  className={`py-1 rounded-md flex items-center justify-center transition ${
+                    activeTab === "stats" ? "bg-cyan-600 text-white font-bold" : "hover:text-white"
                   }`}
                 >
-                  <BarChart3 className="w-3 h-3" />
-                  <span>Stats</span>
+                  Stats
+                </button>
+                <button
+                  onClick={() => setActiveTab("activity")}
+                  className={`py-1 rounded-md flex items-center justify-center transition ${
+                    activeTab === "activity" ? "bg-cyan-600 text-white font-bold" : "hover:text-white"
+                  }`}
+                >
+                  Activity
+                </button>
+                <button
+                  onClick={() => setActiveTab("settings")}
+                  className={`py-1 rounded-md flex items-center justify-center transition ${
+                    activeTab === "settings" ? "bg-cyan-600 text-white font-bold" : "hover:text-white"
+                  }`}
+                >
+                  Settings
                 </button>
               </div>
             </div>
 
             {/* Tab Panel Content */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
-              {activeTab === "inbox" && (
+              {activeTab === "artifacts" && (
                 <div className="space-y-3">
                   <h4 className="font-bold text-slate-300 text-xs flex items-center gap-1.5">
-                    <Inbox className="w-4 h-4 text-cyan-400" />
-                    Attention Inbox & Approvals
+                    <BookOpen className="w-4 h-4 text-cyan-400" />
+                    Artifacts & Documents Vault
                   </h4>
-                  <div className="bg-[#0f172a] border border-slate-800 rounded-xl p-3 space-y-2">
-                    <div className="flex items-center justify-between text-emerald-400 font-semibold">
-                      <span className="flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> All Agent Tasks Healthy
-                      </span>
-                      <span className="text-[10px] text-slate-500">Just now</span>
-                    </div>
-                    <p className="text-slate-400 text-[11px]">
-                      No urgent approval blockers. Autonomous workforce is active across 3D office desks.
-                    </p>
+                  <div className="p-3 bg-[#0f172a] border border-slate-800 rounded-xl space-y-1">
+                    <span className="font-semibold text-white">📄 System Architecture Blueprint</span>
+                    <p className="text-[11px] text-slate-400">Generated by OpenClaw Coder • Updated 2m ago</p>
                   </div>
                 </div>
               )}
 
-              {activeTab === "history" && (
+              {activeTab === "skills" && (
                 <div className="space-y-3">
                   <h4 className="font-bold text-slate-300 text-xs flex items-center gap-1.5">
-                    <History className="w-4 h-4 text-cyan-400" />
-                    Recent Activity Audit Stream
+                    <Sparkles className="w-4 h-4 text-fuchsia-400" />
+                    Installed Skills & Capabilities
                   </h4>
-                  <div className="space-y-2">
-                    <div className="p-2.5 bg-[#0f172a] border border-slate-800 rounded-lg text-slate-300">
-                      <span className="text-cyan-400 font-medium">🤖 OpenClaw Coder</span> updated schema definition in <span className="text-slate-100 font-mono">human_employees.ts</span>
-                    </div>
-                    <div className="p-2.5 bg-[#0f172a] border border-slate-800 rounded-lg text-slate-300">
-                      <span className="text-emerald-400 font-medium">👤 Alex Mercer</span> assigned 3D desk seat #1 in Main Office
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "kanban" && (
-                <div className="space-y-3">
-                  <h4 className="font-bold text-slate-300 text-xs flex items-center gap-1.5">
-                    <Kanban className="w-4 h-4 text-cyan-400" />
-                    Active Issues Task Board
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="p-3 bg-[#0f172a] border border-slate-800 rounded-xl space-y-1">
-                      <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-semibold">In Progress</span>
-                      <p className="font-bold text-slate-100 text-xs">PAP-101: 3D Office HQ Interface Integration</p>
-                      <p className="text-[11px] text-slate-400">Assigned: Alex Mercer (Human) & OpenClaw (Bot)</p>
-                    </div>
+                  <div className="p-3 bg-[#0f172a] border border-slate-800 rounded-xl space-y-1">
+                    <span className="font-semibold text-fuchsia-300">⚡ PR Code Reviewer Skill</span>
+                    <p className="text-[11px] text-slate-400">Active across 3 AI Agent Workers</p>
                   </div>
                 </div>
               )}
@@ -218,13 +184,13 @@ export const HQSidebar: React.FC<HQSidebarProps> = ({
                     Workforce Routines & Playbooks
                   </h4>
                   <div className="p-3 bg-[#0f172a] border border-slate-800 rounded-xl space-y-1 text-slate-300">
-                    <span className="font-semibold text-slate-100">📖 Automated PR Review & CI Pipeline</span>
-                    <p className="text-[11px] text-slate-400">Runs daily standup and reviews all merged PRs automatically.</p>
+                    <span className="font-semibold text-slate-100">📖 Automated Standup Routine</span>
+                    <p className="text-[11px] text-slate-400">Triggers daily 9:00 AM sync meeting in Standup Room.</p>
                   </div>
                 </div>
               )}
 
-              {activeTab === "analytics" && (
+              {activeTab === "stats" && (
                 <div className="space-y-3">
                   <h4 className="font-bold text-slate-300 text-xs flex items-center gap-1.5">
                     <BarChart3 className="w-4 h-4 text-cyan-400" />
@@ -238,6 +204,41 @@ export const HQSidebar: React.FC<HQSidebarProps> = ({
                     <div className="p-3 bg-[#0f172a] border border-slate-800 rounded-xl">
                       <span className="text-[10px] text-slate-400 block">AI Bots ({agentCount})</span>
                       <span className="text-sm font-bold text-blue-400">$770.00/mo</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "activity" && (
+                <div className="space-y-3">
+                  <h4 className="font-bold text-slate-300 text-xs flex items-center gap-1.5">
+                    <History className="w-4 h-4 text-cyan-400" />
+                    Live Audit Activity Stream
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="p-2.5 bg-[#0f172a] border border-slate-800 rounded-lg text-slate-300">
+                      <span className="text-cyan-400 font-medium">🤖 OpenClaw Coder</span> updated 4-sided office layout
+                    </div>
+                    <div className="p-2.5 bg-[#0f172a] border border-slate-800 rounded-lg text-slate-300">
+                      <span className="text-emerald-400 font-medium">👤 Alex Mercer</span> opened Top Personnel Bar
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "settings" && (
+                <div className="space-y-3">
+                  <h4 className="font-bold text-slate-300 text-xs flex items-center gap-1.5">
+                    <span>⚙️</span> Platform Settings
+                  </h4>
+                  <div className="p-3 bg-[#0f172a] border border-slate-800 rounded-xl space-y-2">
+                    <div className="flex justify-between items-center text-slate-300">
+                      <span>Firebase Auth</span>
+                      <span className="text-emerald-400 font-bold">Enabled</span>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-300">
+                      <span>Firestore Collection</span>
+                      <span className="text-cyan-400 font-mono text-[10px]">default</span>
                     </div>
                   </div>
                 </div>
