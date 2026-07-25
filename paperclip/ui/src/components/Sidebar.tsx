@@ -185,12 +185,14 @@ export function Sidebar() {
           {(() => {
             const newTaskButton = (
               <button
-                onClick={() => openNewIssue()}
+                onClick={() => {
+                  window.location.href = "/office?action=new_task";
+                }}
                 data-slot="icon-button"
                 aria-label={rail ? "New Task" : undefined}
                 className="flex items-center gap-2.5 mx-2 rounded-lg px-2 py-1.5 pointer-coarse:py-1 text-(length:--text-compact) font-medium text-foreground/80 hover:bg-accent/50 hover:text-foreground transition-colors"
               >
-                <SquarePen className="h-4 w-4 shrink-0" />
+                <SquarePen className="h-4 w-4 shrink-0 text-cyan-400" />
                 <span className={rail ? SIDEBAR_RAIL_HIDDEN_LABEL : "truncate"}>New Task</span>
               </button>
             );

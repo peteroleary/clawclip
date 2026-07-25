@@ -14,16 +14,26 @@ interface KanbanImmersiveScreenProps {
   isOpen: boolean;
   onClose: () => void;
   companyId?: string;
+  initialCreateMode?: boolean;
 }
 
 export const KanbanImmersiveScreen: React.FC<KanbanImmersiveScreenProps> = ({
   isOpen,
   onClose,
   companyId,
+  initialCreateMode = false,
 }) => {
   const [issues, setIssues] = useState<IssueItem[]>([]);
   const [newTitle, setNewTitle] = useState("");
-  const [showNewModal, setShowNewModal] = useState(false);
+  const [newDescription, setNewDescription] = useState("");
+  const [newPriority, setNewPriority] = useState("medium");
+  const [showNewModal, setShowNewModal] = useState(initialCreateMode);
+
+  useEffect(() => {
+    if (isOpen && initialCreateMode) {
+      setShowNewModal(true);
+    }
+  }, [isOpen, initialCreateMode]);
 
   useEffect(() => {
     async function fetchIssues() {
@@ -69,21 +79,38 @@ export const KanbanImmersiveScreen: React.FC<KanbanImmersiveScreenProps> = ({
     { id: "done", label: "Completed", color: "border-emerald-500/30 bg-emerald-950/20" },
   ];
 
-  const handleCreateIssue = (e: React.FormEvent) => {
+  const handleCreateIssue = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
+
+    if (companyId) {
+      try {
+        await fetch(`/api/companies/${companyId}/issues`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: newTitle,
+            description: newDescription,
+            priority: newPriority,
+          }),
+        });
+      } catch (err) {
+        console.error("Failed to post issue to backend:", err);
+      }
+    }
 
     const newIssue: IssueItem = {
       id: `issue-${Date.now()}`,
       identifier: `PAP-${Math.floor(Math.random() * 900 + 100)}`,
       title: newTitle,
       status: "todo",
-      priority: "high",
+      priority: newPriority,
       assigneeName: "OpenClaw Coder (Bot)",
     };
 
     setIssues((prev) => [newIssue, ...prev]);
     setNewTitle("");
+    setNewDescription("");
     setShowNewModal(false);
   };
 
@@ -181,7 +208,7 @@ export const KanbanImmersiveScreen: React.FC<KanbanImmersiveScreenProps> = ({
 
               <form onSubmit={handleCreateIssue} className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-slate-300 mb-1">Task Title</label>
+                  <label className="block text-slate-300 mb-1 font-medium">Task Title</label>
                   <input
                     type="text"
                     required
@@ -190,6 +217,31 @@ export const KanbanImmersiveScreen: React.FC<KanbanImmersiveScreenProps> = ({
                     onChange={(e) => setNewTitle(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-cyan-500"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Description</label>
+                  <textarea
+                    rows={3}
+                    placeholder="Provide details about the task..."
+                    value={newDescription}
+                    onChange={(e) => setNewDescription(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-cyan-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 mb-1 font-medium">Priority</label>
+                  <select
+                    value={newPriority}
+                    onChange={(e) => setNewPriority(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                  </select>
                 </div>
 
                 <div className="flex justify-end space-x-2 pt-2">

@@ -78,6 +78,16 @@ export const HQSidebar: React.FC<HQSidebarProps> = ({
                 </h3>
                 <div className="flex items-center space-x-1.5">
                   <button
+                    onClick={() => {
+                      setActiveTab("kanban");
+                    }}
+                    className="p-1.5 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+                    title="Dispatch New Task"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>New Task</span>
+                  </button>
+                  <button
                     onClick={onAddHuman}
                     className="p-1.5 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
                     title="Add Human Staff"

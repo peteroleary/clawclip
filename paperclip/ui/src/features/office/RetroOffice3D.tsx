@@ -15,6 +15,7 @@ interface RetroOffice3DProps {
   onSelectMember?: (member: Workforce3DMember) => void;
   selectedMemberId?: string | null;
   companyId?: string;
+  initialKanbanCreateMode?: boolean;
 }
 
 export const RetroOffice3D: React.FC<RetroOffice3DProps> = ({
@@ -22,12 +23,21 @@ export const RetroOffice3D: React.FC<RetroOffice3DProps> = ({
   onSelectMember,
   selectedMemberId,
   companyId,
+  initialKanbanCreateMode = false,
 }) => {
   const [selectedMember, setSelectedMember] = useState<Workforce3DMember | null>(null);
   const [atmOpen, setAtmOpen] = useState(false);
   const [githubOpen, setGithubOpen] = useState(false);
   const [standupOpen, setStandupOpen] = useState(false);
   const [kanbanOpen, setKanbanOpen] = useState(false);
+  const [kanbanCreateMode, setKanbanCreateMode] = useState(false);
+
+  React.useEffect(() => {
+    if (initialKanbanCreateMode) {
+      setKanbanCreateMode(true);
+      setKanbanOpen(true);
+    }
+  }, [initialKanbanCreateMode]);
 
   const handleSelect = (member: Workforce3DMember) => {
     setSelectedMember(member);
@@ -241,7 +251,15 @@ export const RetroOffice3D: React.FC<RetroOffice3DProps> = ({
       <AtmImmersiveScreen isOpen={atmOpen} onClose={() => setAtmOpen(false)} />
       <GithubImmersiveScreen isOpen={githubOpen} onClose={() => setGithubOpen(false)} />
       <StandupImmersiveScreen isOpen={standupOpen} onClose={() => setStandupOpen(false)} />
-      <KanbanImmersiveScreen isOpen={kanbanOpen} onClose={() => setKanbanOpen(false)} companyId={companyId} />
+      <KanbanImmersiveScreen
+        isOpen={kanbanOpen}
+        onClose={() => {
+          setKanbanOpen(false);
+          setKanbanCreateMode(false);
+        }}
+        companyId={companyId}
+        initialCreateMode={kanbanCreateMode}
+      />
     </div>
   );
 };

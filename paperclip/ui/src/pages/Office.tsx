@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { RetroOffice3D } from "../features/office/RetroOffice3D.js";
 import { HQSidebar } from "../features/office/components/HQSidebar.js";
 import { OfficeFloorNav } from "../features/office/components/OfficeFloorNav.js";
@@ -10,6 +10,8 @@ import { Users, Bot, Building2, Sparkles } from "lucide-react";
 
 export const OfficePage: React.FC = () => {
   const { companyId } = useParams<{ companyId: string }>();
+  const [searchParams] = useSearchParams();
+  const initialNewTask = searchParams.get("action") === "new_task";
   const navigate = useNavigate();
   const [workforce, setWorkforce] = useState<Workforce3DMember[]>([]);
   const [filterType, setFilterType] = useState<"all" | "human" | "agent">("all");
@@ -132,6 +134,7 @@ export const OfficePage: React.FC = () => {
             selectedMemberId={selectedMember?.id}
             onSelectMember={(member) => setSelectedMember(member)}
             companyId={companyId}
+            initialKanbanCreateMode={initialNewTask}
           />
         )}
 

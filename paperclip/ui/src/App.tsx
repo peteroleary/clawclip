@@ -101,7 +101,7 @@ import { normalizeRememberedInstanceSettingsPath } from "./lib/instance-settings
 function boardRoutes() {
   return (
     <>
-      <Route index element={<Navigate to="dashboard" replace />} />
+      <Route index element={<Navigate to="office" replace />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="office" element={<OfficePage />} />
       <Route path="human-employees" element={<HumanEmployeesPage />} />
