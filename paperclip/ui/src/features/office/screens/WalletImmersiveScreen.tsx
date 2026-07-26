@@ -70,7 +70,7 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
     { id: "a1", name: "Paperclip AI Inc", bank: "Silicon Valley Bank", last4: "9901", routing: "021000021", status: "Verified" },
   ]);
 
-  const [budgets] = useState([
+  const [tagBudgets] = useState([
     { id: "b1", tag: "#engineering", allocated: 50000, spent: 42000, provider: "ramp", externalId: "bgt_1928" },
     { id: "b2", tag: "#marketing", allocated: 20000, spent: 18500, provider: "stripe", externalId: "bgt_4210" },
     { id: "b3", tag: "#project-clawclip", allocated: 15000, spent: 16500, provider: "ramp", externalId: "bgt_1092" },
@@ -636,7 +636,6 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
             </div>
           </div>
         )}
-      </div>
     </ImmersiveScreenWrapper>
   );
 };
