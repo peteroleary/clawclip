@@ -38,7 +38,7 @@ export const OfficeEnvironment: React.FC<OfficeEnvironmentProps> = ({ onDeskClic
       {type === "Classroom" && <ClassroomPreset onDeskClick={onDeskClick} />}
       {type === "Office" && <OfficePreset onDeskClick={onDeskClick} />}
       {type === "Factory" && <FactoryPreset />}
-      {(type === "Kitchen/Bakery" || type === "Bakery") && <BakeryPreset />}
+      {type === "Kitchen/Bakery" && <BakeryPreset />}
       {type === "Lab" && <LabPreset />}
       {type === "Store" && <StorePreset />}
       {type === "Shop" && <ShopPreset />}

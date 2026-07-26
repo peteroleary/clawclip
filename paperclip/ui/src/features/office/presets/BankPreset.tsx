@@ -34,13 +34,13 @@ export const BankPreset: React.FC = () => {
           <meshStandardMaterial color="#94a3b8" metalness={0.8} roughness={0.2} />
         </mesh>
         {/* Vault Door (Massive Steel) */}
-        <mesh position={[0, 2, 2.6]}>
-          <cylinderGeometry args={[1.5, 1.5, 0.4, 32]} rotation={[Math.PI / 2, 0, 0]} />
+        <mesh position={[0, 2, 2.6]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[1.5, 1.5, 0.4, 32]} />
           <meshStandardMaterial color="#cbd5e1" metalness={1.0} roughness={0.1} />
         </mesh>
         {/* Locking Mechanism details on door */}
-        <mesh position={[0, 2, 2.85]}>
-          <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} rotation={[Math.PI / 2, 0, 0]} />
+        <mesh position={[0, 2, 2.85]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
           <meshStandardMaterial color="#eab308" metalness={0.9} />
         </mesh>
       </group>

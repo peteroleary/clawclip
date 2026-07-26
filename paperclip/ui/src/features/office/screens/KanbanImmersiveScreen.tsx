@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import type { Workforce3DMember } from "../types.js";
 import { useOfficeStore } from "../../../store/officeStore.js";
+import { ImmersiveScreenWrapper } from "../components/ImmersiveScreenWrapper.js";
 
 export type IssueStatus =
   | "triage"
@@ -387,11 +388,20 @@ export const KanbanImmersiveScreen: React.FC<KanbanImmersiveScreenProps> = ({
   });
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col p-4 md:p-6 overflow-hidden">
-      <div className="bg-[#090d16] border border-slate-800 rounded-2xl w-full h-full shadow-2xl text-slate-100 font-sans flex flex-col relative overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#06090d] border-b border-slate-800 shrink-0 relative z-20">
-          <div className="flex items-center space-x-3">
+    <ImmersiveScreenWrapper
+      isOpen={isOpen}
+      onClose={onClose}
+      title={currentBoard.name}
+      subtitle="Kanban Tasks & Issue Board"
+      icon={Kanban}
+      iconColorClass="text-cyan-400"
+      iconBgClass="bg-cyan-500/10 border-cyan-500/30"
+      closeOnEsc={!showNewModal && !selectedCard && !showNewBoardModal && !showBoardDropdown}
+      showHeader={false}
+    >
+      {/* Control bar */}
+      <div className="px-6 py-3 bg-[#06090d]/60 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4 shrink-0 overflow-x-auto relative z-20">
+        <div className="flex items-center space-x-3">
             {/* Clickable Board Icon with Dropdown */}
             <div className="relative">
               <button
@@ -510,52 +520,55 @@ export const KanbanImmersiveScreen: React.FC<KanbanImmersiveScreenProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => {
-                const channelId = activeBoardId === "proj_clawclip"
-                  ? "proj-clawclip"
-                  : activeBoardId === "proj_atm"
-                  ? "proj-atm-treasury"
-                  : activeBoardId === "engineering"
-                  ? "dept-engineering"
-                  : activeBoardId === "ai_swarm"
-                  ? "dept-swarms"
-                  : activeBoardId === "team_squad"
-                  ? "team-core-squad"
-                  : "general";
-                openEntityChat(channelId);
-              }}
-              className="flex items-center space-x-1.5 px-3 py-2 bg-purple-950/60 hover:bg-purple-900 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-semibold transition"
-              title="Open linked entity Group Chat channel"
-            >
-              <MessageSquare className="w-4 h-4 text-purple-400" />
-              <span>Open Group Chat</span>
-            </button>
+          <div className="flex items-center space-x-3 shrink-0">
+            <div className="relative group/tooltip">
+              <button
+                onClick={() => {
+                  const channelId = activeBoardId === "proj_clawclip"
+                    ? "proj-clawclip"
+                    : activeBoardId === "proj_atm"
+                    ? "proj-atm-treasury"
+                    : activeBoardId === "engineering"
+                    ? "dept-engineering"
+                    : activeBoardId === "ai_swarm"
+                    ? "dept-swarms"
+                    : activeBoardId === "team_squad"
+                    ? "team-core-squad"
+                    : "general";
+                  openEntityChat(channelId);
+                }}
+                className="p-2 bg-purple-950/60 hover:bg-purple-900 border border-purple-500/30 text-purple-300 rounded-xl transition"
+              >
+                <MessageSquare className="w-5 h-5 text-purple-400" />
+              </button>
+              <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[10px] font-medium px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                Group Chat
+              </span>
+            </div>
 
-            <button
-              onClick={() => setShowNewBoardModal(true)}
-              className="flex items-center space-x-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700 transition"
-            >
-              <LayoutGrid className="w-4 h-4 text-cyan-400" />
-              <span>+ New Board</span>
-            </button>
+            <div className="relative group/tooltip">
+              <button
+                onClick={() => setShowNewBoardModal(true)}
+                className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700 transition"
+              >
+                <LayoutGrid className="w-5 h-5 text-cyan-400" />
+              </button>
+              <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[10px] font-medium px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                Create Board
+              </span>
+            </div>
 
-            <button
-              onClick={() => setShowNewModal(true)}
-              className="flex items-center space-x-1.5 px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-cyan-950/50 border border-cyan-400/30 transition hover:scale-105 active:scale-95"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Create Task</span>
-            </button>
-
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition"
-              title="Close Board (ESC)"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="relative group/tooltip">
+              <button
+                onClick={() => setShowNewModal(true)}
+                className="p-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl shadow-lg border border-cyan-400/30 transition hover:scale-105 active:scale-95"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+              <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[10px] font-medium px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                Create Task
+              </span>
+            </div>
           </div>
         </div>
 
@@ -1047,8 +1060,7 @@ export const KanbanImmersiveScreen: React.FC<KanbanImmersiveScreenProps> = ({
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </ImmersiveScreenWrapper>
   );
 };
 

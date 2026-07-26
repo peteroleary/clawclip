@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, FolderKanban, Plus, ExternalLink, Kanban, MessageSquare, Link2 } from "lucide-react";
+import { X, FolderKanban, Plus, ExternalLink, Kanban, MessageSquare, Link2, Edit2, Trash2 } from "lucide-react";
 import type { Workforce3DMember } from "../types.js";
 import { useOfficeStore } from "../../../store/officeStore.js";
 import { ImmersiveScreenWrapper } from "../components/ImmersiveScreenWrapper.js";
@@ -20,6 +20,7 @@ export const ProjectsImmersiveScreen: React.FC<ProjectsImmersiveScreenProps> = (
   const openLinkModal = useOfficeStore((state) => state.openLinkModal);
 
   const [showModal, setShowModal] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [lead, setLead] = useState("");
@@ -63,34 +64,34 @@ export const ProjectsImmersiveScreen: React.FC<ProjectsImmersiveScreenProps> = (
     e.preventDefault();
     if (!name.trim()) return;
 
-    setProjects([
-      {
-        id: `p_${Date.now()}`,
+    if (editingProjectId) {
+      setProjects(projects.map(p => p.id === editingProjectId ? {
+        ...p,
         name: name.trim(),
-        status: "Planning",
-        progress: 0,
-        tasks: "0 / 5 Completed",
         desc: desc || "New strategic initiative.",
         budget: parseInt(budget, 10) || 0,
-        spent: 0,
-      },
-      ...projects,
-    ]);
+      } : p));
+      setEditingProjectId(null);
+    } else {
+      setProjects([
+        {
+          id: `p_${Date.now()}`,
+          name: name.trim(),
+          status: "Planning",
+          progress: 0,
+          tasks: "0 / 5 Completed",
+          desc: desc || "New strategic initiative.",
+          budget: parseInt(budget, 10) || 0,
+          spent: 0,
+        },
+        ...projects,
+      ]);
+    }
 
     setName("");
     setDesc("");
     setShowModal(false);
   };
-
-  const headerActions = (
-    <button
-      onClick={() => setShowModal(true)}
-      className="flex items-center space-x-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-950/50"
-    >
-      <Plus className="w-4 h-4" />
-      <span>+ New Project</span>
-    </button>
-  );
 
   return (
     <ImmersiveScreenWrapper
@@ -101,12 +102,37 @@ export const ProjectsImmersiveScreen: React.FC<ProjectsImmersiveScreenProps> = (
       icon={FolderKanban}
       iconColorClass="text-blue-400"
       iconBgClass="bg-blue-500/10 border-blue-500/30"
-      headerActions={headerActions}
       closeOnEsc={!showModal}
+      showHeader={false}
     >
       {/* Content Body */}
-      <div className="flex-1 p-6 overflow-y-auto space-y-4 max-w-5xl mx-auto w-full">
-        {projects.map((proj) => (
+      <div className="flex-1 p-6 overflow-y-auto w-full">
+        <div className="max-w-5xl mx-auto mb-6 flex justify-between items-center pb-3 border-b border-slate-800/80">
+          <div className="flex bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200">
+            Active Projects ({projects.length})
+          </div>
+          
+          <div className="relative group">
+            <button
+              onClick={() => {
+                setEditingProjectId(null);
+                setName("");
+                setDesc("");
+                setBudget("100000");
+                setShowModal(true);
+              }}
+              className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition shadow-lg flex items-center justify-center"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[10px] font-medium px-2 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-50">
+              Create Project
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-4 max-w-5xl mx-auto w-full">
+          {projects.map((proj) => (
           <div key={proj.id} className="bg-slate-950/80 border border-slate-800 p-5 rounded-2xl space-y-4 hover:border-blue-500/40 transition shadow-lg">
             <div className="flex justify-between items-start">
               <div>
@@ -131,28 +157,77 @@ export const ProjectsImmersiveScreen: React.FC<ProjectsImmersiveScreenProps> = (
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => openLinkModal(proj.id, "project", proj.name)}
-                    className="px-3 py-1 bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
-                  >
-                    <Link2 className="w-3.5 h-3.5" /> Link
-                  </button>
-                  <button
-                    onClick={() => openEntityBoard(proj.id === "p1" ? "proj_clawclip" : "proj_atm")}
-                    className="px-3 py-1 bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/30 text-cyan-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
-                  >
-                    <Kanban className="w-3.5 h-3.5" /> Open Board
-                  </button>
-                  <button
-                    onClick={() => openEntityChat(proj.id === "p1" ? "proj_clawclip" : "proj_atm")}
-                    className="px-3 py-1 bg-blue-950/60 hover:bg-blue-900 border border-blue-500/30 text-blue-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" /> Open Chat
-                  </button>
+                <div className="flex items-center space-x-1.5">
+                  <div className="relative group/tooltip">
+                    <button
+                      onClick={() => {
+                        setEditingProjectId(proj.id);
+                        setName(proj.name);
+                        setDesc(proj.desc);
+                        setBudget((proj.budget || 0).toString());
+                        setShowModal(true);
+                      }}
+                      className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                      Edit
+                    </span>
+                  </div>
+
+                  <div className="relative group/tooltip">
+                    <button
+                      onClick={() => openLinkModal(proj.id, "project", proj.name)}
+                      className="p-1.5 text-indigo-400 hover:text-white bg-indigo-950/40 border border-indigo-900/60 rounded-lg transition"
+                    >
+                      <Link2 className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                      Link
+                    </span>
+                  </div>
+
+                  <div className="relative group/tooltip">
+                    <button
+                      onClick={() => openEntityBoard(proj.id === "p1" ? "proj_clawclip" : "proj_atm")}
+                      className="p-1.5 text-cyan-400 hover:text-white bg-cyan-950/40 border border-cyan-900/60 rounded-lg transition"
+                    >
+                      <Kanban className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                      Board
+                    </span>
+                  </div>
+
+                  <div className="relative group/tooltip">
+                    <button
+                      onClick={() => openEntityChat(proj.id === "p1" ? "proj_clawclip" : "proj_atm")}
+                      className="p-1.5 text-purple-400 hover:text-white bg-purple-950/40 border border-purple-900/60 rounded-lg transition"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                      Chat
+                    </span>
+                  </div>
+
+                  <div className="relative group/tooltip">
+                    <button
+                      onClick={() => setProjects(projects.filter(p => p.id !== proj.id))}
+                      className="p-1.5 text-rose-455 hover:text-rose-455 hover:bg-rose-950/20 bg-slate-900 border border-slate-800 rounded-lg transition"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                      Delete
+                    </span>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              {/* Progress bar */}
+            {/* Progress bar */}
               <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
                 <div
                   className="bg-gradient-to-r from-blue-600 to-cyan-400 h-full rounded-full transition-all duration-500"
@@ -177,6 +252,7 @@ export const ProjectsImmersiveScreen: React.FC<ProjectsImmersiveScreenProps> = (
           </div>
         ))}
       </div>
+    </div>
 
       {/* Create Project Modal */}
       {showModal && (

@@ -166,15 +166,15 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
   ]);
 
   const [teams, setTeams] = useState([
-    { id: "team_1", name: "Core Product Squad", desc: "Builds web UI and 3D office platform features.", members: "4 Staff", budget: 1200000, spent: 500000, status: "Active", targets: ["Launch New Dashboard", "Improve User Onboarding"], projects: ["Dashboard V2"], routines: ["Daily Sync"], artifacts: ["Figma_Mockups.url"] },
+    { id: "team_1", name: "Core Product Squad", desc: "Builds web UI and 3D office platform features.", lead: "Alex Mercer", members: "4 Staff", budget: 1200000, spent: 500000, status: "Active", targets: ["Launch New Dashboard", "Improve User Onboarding"], projects: ["Dashboard V2"], routines: ["Daily Sync"], artifacts: ["Figma_Mockups.url"] },
   ]);
 
   const [swarms, setSwarms] = useState([
-    { id: "swarm_1", name: "AI Swarm Alpha", desc: "Autonomous background agents handling code reviews and deployments.", members: "6 Agents", budget: 20000, spent: 18000, status: "Active", targets: ["Process 100 PRs/day", "Zero Deployment Rollbacks"], projects: ["CI/CD Pipeline Automation"], routines: ["Real-time PR Monitoring"], skills: ["Python", "Docker", "Kubernetes"], artifacts: ["Deployment_Logs.txt"] },
+    { id: "swarm_1", name: "AI Swarm Alpha", desc: "Autonomous background agents handling code reviews and deployments.", lead: "Hermes Manager", members: "6 Agents", budget: 20000, spent: 18000, status: "Active", targets: ["Process 100 PRs/day", "Zero Deployment Rollbacks"], projects: ["CI/CD Pipeline Automation"], routines: ["Real-time PR Monitoring"], skills: ["Python", "Docker", "Kubernetes"], artifacts: ["Deployment_Logs.txt"] },
   ]);
 
   const [troops, setTroops] = useState([
-    { id: "troop_1", name: "Full-Stack Deployment Troop", desc: "Combined human engineers and agent automation swarms.", members: "4 Staff + 5 Agents", budget: 500000, spent: 210000, status: "Active", targets: ["Migrate to Cloud-Native", "Establish DevOps Culture"], projects: ["Infrastructure as Code", "Monitoring Revamp"], routines: ["Weekly DevOps Sync"], artifacts: ["Terraform_State.json"] },
+    { id: "troop_1", name: "Full-Stack Deployment Troop", desc: "Combined human engineers and agent automation swarms.", lead: "Sarah Chen", members: "4 Staff + 5 Agents", budget: 500000, spent: 210000, status: "Active", targets: ["Migrate to Cloud-Native", "Establish DevOps Culture"], projects: ["Infrastructure as Code", "Monitoring Revamp"], routines: ["Weekly DevOps Sync"], artifacts: ["Terraform_State.json"] },
   ]);
 
   useEffect(() => {
@@ -299,7 +299,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
     if (editingEntityId) {
       setDepartments(departments.map(d => d.id === editingEntityId ? { ...d, name: deptName, lead: deptHead, budget: parseInt(deptBudget, 10) || 0, status: deptStatus } : d));
     } else {
-      setDepartments([...departments, { id: `dept_${Date.now()}`, name: deptName, lead: deptHead || "Unassigned", count: "0 Members", color: "border-slate-500/30 bg-slate-950/20", budget: parseInt(deptBudget, 10) || 0, spent: 0, status: deptStatus }]);
+      setDepartments([...departments, { id: `dept_${Date.now()}`, name: deptName, lead: deptHead || "Unassigned", count: "0 Members", color: "border-slate-500/30 bg-slate-950/20", budget: parseInt(deptBudget, 10) || 0, spent: 0, status: deptStatus, targets: [], projects: [], routines: [], artifacts: [] }]);
     }
     setDeptName("");
     setDeptHead("");
@@ -314,7 +314,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
     if (editingEntityId) {
       setTeams(teams.map(t => t.id === editingEntityId ? { ...t, name: teamName, lead: teamLead, budget: parseInt(teamBudget, 10) || 0, status: teamStatus } : t));
     } else {
-      setTeams([...teams, { id: `team_${Date.now()}`, name: teamName, desc: "New Team", lead: teamLead, members: "0 Staff", budget: parseInt(teamBudget, 10) || 0, spent: 0, status: teamStatus }]);
+      setTeams([...teams, { id: `team_${Date.now()}`, name: teamName, desc: "New Team", lead: teamLead, members: "0 Staff", budget: parseInt(teamBudget, 10) || 0, spent: 0, status: teamStatus, targets: [], projects: [], routines: [], artifacts: [] }]);
     }
     setTeamName("");
     setTeamLead("");
@@ -329,7 +329,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
     if (editingEntityId) {
       setSwarms(swarms.map(s => s.id === editingEntityId ? { ...s, name: swarmName, lead: swarmLead, budget: parseInt(swarmBudget, 10) || 0, status: swarmStatus } : s));
     } else {
-      setSwarms([...swarms, { id: `swarm_${Date.now()}`, name: swarmName, desc: "New Swarm", lead: swarmLead, members: "0 Agents", budget: parseInt(swarmBudget, 10) || 0, spent: 0, status: swarmStatus }]);
+      setSwarms([...swarms, { id: `swarm_${Date.now()}`, name: swarmName, desc: "New Swarm", lead: swarmLead, members: "0 Agents", budget: parseInt(swarmBudget, 10) || 0, spent: 0, status: swarmStatus, targets: [], projects: [], routines: [], skills: [], artifacts: [] }]);
     }
     setSwarmName("");
     setSwarmLead("");
@@ -344,7 +344,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
     if (editingEntityId) {
       setTroops(troops.map(t => t.id === editingEntityId ? { ...t, name: troopName, lead: troopLead, budget: parseInt(troopBudget, 10) || 0, status: troopStatus } : t));
     } else {
-      setTroops([...troops, { id: `troop_${Date.now()}`, name: troopName, desc: "New Troop", lead: troopLead, members: "0 Staff + 0 Agents", budget: parseInt(troopBudget, 10) || 0, spent: 0, status: troopStatus }]);
+      setTroops([...troops, { id: `troop_${Date.now()}`, name: troopName, desc: "New Troop", lead: troopLead, members: "0 Staff + 0 Agents", budget: parseInt(troopBudget, 10) || 0, spent: 0, status: troopStatus, targets: [], projects: [], routines: [], artifacts: [] }]);
     }
     setTroopName("");
     setTroopLead("");
@@ -447,59 +447,71 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
       icon={Users}
       iconColorClass="text-purple-400"
       iconBgClass="bg-purple-500/10 border-purple-500/30"
-      headerActions={headerActions}
       closeOnEsc={!hasOpenModal}
+      showHeader={false}
     >
       {/* Content Body */}
       <div className="flex-1 p-6 overflow-y-auto">
-          {tabHeader && (
-            <div className="max-w-5xl mx-auto mb-6 flex justify-between items-center pb-2 border-b border-slate-800">
-              <div className="text-left">
-                <h3 className="font-bold text-slate-200 text-sm flex items-center gap-2">
-                  {tabHeader.icon} {tabHeader.title}
-                </h3>
-                {tabHeader.desc && <p className="text-xs text-slate-400 mt-0.5">{tabHeader.desc}</p>}
+        <div className="max-w-5xl mx-auto mb-6 flex flex-wrap gap-4 justify-between items-center pb-3 border-b border-slate-800/80">
+          {/* Left side: Tabs */}
+          <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-semibold space-x-1 shrink-0">
+            <button onClick={() => setActiveTab("org")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "org" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>Org</button>
+            <button onClick={() => setActiveTab("departments")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "departments" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>Departments</button>
+            <button onClick={() => setActiveTab("humans")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "humans" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>Humans</button>
+            <button onClick={() => setActiveTab("agents")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "agents" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>Agents</button>
+            <button onClick={() => setActiveTab("teams")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "teams" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>Teams</button>
+            <button onClick={() => setActiveTab("swarms")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "swarms" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>Swarms</button>
+            <button onClick={() => setActiveTab("troops")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "troops" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>Troops</button>
+          </div>
+
+          {/* Right side: Filters & Actions */}
+          <div className="flex items-center gap-3">
+            {activeTab !== "org" && (
+              <div className="flex items-center gap-3 bg-slate-900/60 border border-slate-800/80 rounded-xl px-3 py-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Status:</span>
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="bg-slate-950 border border-slate-850 rounded-lg px-2 py-0.5 text-xs text-slate-205 focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="All">All</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Sort:</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as any)}
+                    className="bg-slate-950 border border-slate-850 rounded-lg px-2 py-0.5 text-xs text-slate-205 focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="name">Name</option>
+                    <option value="budget">Budget / Cost</option>
+                    <option value="headcount">Headcount</option>
+                  </select>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                {/* Filter & Sort Bar */}
-                {activeTab !== "org" && (
-                  <div className="flex items-center gap-4 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-slate-400">Status:</span>
-                      <select
-                        value={filterStatus}
-                        onChange={(e) => setFilterStatus(e.target.value)}
-                        className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
-                      >
-                        <option value="All">All</option>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="Pending">Pending</option>
-                      </select>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-slate-400">Sort By:</span>
-                      <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as any)}
-                        className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
-                      >
-                        <option value="name">Name</option>
-                        <option value="budget">Budget / Cost</option>
-                        <option value="headcount">Headcount</option>
-                      </select>
-                    </div>
-                  </div>
-                )}
+            )}
+
+            {/* Dynamic Icon-Only Add Button with Tooltip */}
+            {tabHeader && tabHeader.action && (
+              <div className="relative group">
                 <button
                   onClick={tabHeader.action}
-                  className="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg"
+                  className="p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl transition shadow-lg flex items-center justify-center"
                 >
-                  <Plus className="w-4 h-4" /> {tabHeader.btnText}
+                  <Plus className="w-5 h-5" />
                 </button>
+                <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-slate-200 text-[10px] font-medium px-2 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-50">
+                  Add {tabHeader.btnText}
+                </span>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        </div>
 
           {activeTab === "org" && (
             <div className="space-y-6 max-w-5xl mx-auto text-center">
@@ -570,36 +582,61 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                           {d.count}
                         </span>
 
-                        <div className="flex items-center space-x-1.5">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingEntityId(d.id);
-                              setDeptName(d.name);
-                              setDeptHead(d.lead);
-                              setDeptBudget((d.budget || 0).toString());
-                              setDeptStatus(d.status || "Active");
-                              setShowDeptModal(true);
-                            }}
-                            className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg"
-                            title="Edit Department"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => openEntityBoard(deptId)}
-                            className="p-1.5 bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/30 text-cyan-300 rounded-lg text-[10px] font-semibold transition flex items-center gap-1"
-                            title="Open Department Board"
-                          >
-                            <Kanban className="w-3 h-3" /> Board
-                          </button>
-                          <button
-                            onClick={() => openEntityChat(idx === 1 ? "dept-engineering" : "general")}
-                            className="p-1.5 bg-purple-950/60 hover:bg-purple-900 border border-purple-500/30 text-purple-300 rounded-lg text-[10px] font-semibold transition flex items-center gap-1"
-                            title="Open Department Group Chat"
-                          >
-                            <MessageSquare className="w-3 h-3" /> Chat
-                          </button>
+                        <div className="flex items-center space-x-1.5" onClick={(e) => e.stopPropagation()}>
+                          <div className="relative group/tooltip">
+                            <button
+                              onClick={() => {
+                                setEditingEntityId(d.id);
+                                setDeptName(d.name);
+                                setDeptHead(d.lead);
+                                setDeptBudget((d.budget || 0).toString());
+                                setDeptStatus(d.status || "Active");
+                                setShowDeptModal(true);
+                              }}
+                              className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                              Edit
+                            </span>
+                          </div>
+
+                          <div className="relative group/tooltip">
+                            <button
+                              onClick={() => openLinkModal(d.id, "department", d.name)}
+                              className="p-1.5 text-indigo-400 hover:text-white bg-indigo-950/40 border border-indigo-900/60 rounded-lg transition"
+                            >
+                              <Link2 className="w-3.5 h-3.5" />
+                            </button>
+                            <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                              Link
+                            </span>
+                          </div>
+
+                          <div className="relative group/tooltip">
+                            <button
+                              onClick={() => openEntityBoard(deptId)}
+                              className="p-1.5 text-cyan-400 hover:text-white bg-cyan-950/40 border border-cyan-900/60 rounded-lg transition"
+                            >
+                              <Kanban className="w-3.5 h-3.5" />
+                            </button>
+                            <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                              Board
+                            </span>
+                          </div>
+
+                          <div className="relative group/tooltip">
+                            <button
+                              onClick={() => openEntityChat(idx === 1 ? "dept-engineering" : "general")}
+                              className="p-1.5 text-purple-400 hover:text-white bg-purple-950/40 border border-purple-900/60 rounded-lg transition"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" />
+                            </button>
+                            <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                              Chat
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -639,19 +676,61 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                         {t.members}
                       </span>
 
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => openEntityBoard("team_squad")}
-                          className="px-2.5 py-1 bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/30 text-cyan-300 rounded-xl text-xs font-semibold transition flex items-center gap-1"
-                        >
-                          <Kanban className="w-3 h-3" /> Board
-                        </button>
-                        <button
-                          onClick={() => openEntityChat("team-core-squad")}
-                          className="px-2.5 py-1 bg-purple-950/60 hover:bg-purple-900 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-semibold transition flex items-center gap-1"
-                        >
-                          <MessageSquare className="w-3 h-3" /> Chat
-                        </button>
+                      <div className="flex items-center space-x-1.5">
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => {
+                              setEditingEntityId(t.id);
+                              setTeamName(t.name);
+                              setTeamLead(t.lead || "");
+                              setTeamBudget((t.budget || 0).toString());
+                              setTeamStatus(t.status || "Active");
+                              setShowTeamModal(true);
+                            }}
+                            className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Edit
+                          </span>
+                        </div>
+
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => openLinkModal(t.id, "team", t.name)}
+                            className="p-1.5 text-indigo-400 hover:text-white bg-indigo-950/40 border border-indigo-900/60 rounded-lg transition"
+                          >
+                            <Link2 className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Link
+                          </span>
+                        </div>
+
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => openEntityBoard("team_squad")}
+                            className="p-1.5 text-cyan-400 hover:text-white bg-cyan-950/40 border border-cyan-900/60 rounded-lg transition"
+                          >
+                            <Kanban className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Board
+                          </span>
+                        </div>
+
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => openEntityChat("team-core-squad")}
+                            className="p-1.5 text-purple-400 hover:text-white bg-purple-950/40 border border-purple-900/60 rounded-lg transition"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Chat
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -690,19 +769,61 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                         {s.members}
                       </span>
 
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => openEntityBoard("ai_swarm")}
-                          className="px-2.5 py-1 bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/30 text-cyan-300 rounded-xl text-xs font-semibold transition flex items-center gap-1"
-                        >
-                          <Kanban className="w-3 h-3" /> Board
-                        </button>
-                        <button
-                          onClick={() => openEntityChat("dept-swarms")}
-                          className="px-2.5 py-1 bg-purple-950/60 hover:bg-purple-900 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-semibold transition flex items-center gap-1"
-                        >
-                          <MessageSquare className="w-3 h-3" /> Chat
-                        </button>
+                      <div className="flex items-center space-x-1.5">
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => {
+                              setEditingEntityId(s.id);
+                              setSwarmName(s.name);
+                              setSwarmLead(s.lead || "");
+                              setSwarmBudget((s.budget || 0).toString());
+                              setSwarmStatus(s.status || "Active");
+                              setShowSwarmModal(true);
+                            }}
+                            className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Edit
+                          </span>
+                        </div>
+
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => openLinkModal(s.id, "swarm", s.name)}
+                            className="p-1.5 text-indigo-400 hover:text-white bg-indigo-950/40 border border-indigo-900/60 rounded-lg transition"
+                          >
+                            <Link2 className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Link
+                          </span>
+                        </div>
+
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => openEntityBoard("ai_swarm")}
+                            className="p-1.5 text-cyan-400 hover:text-white bg-cyan-950/40 border border-cyan-900/60 rounded-lg transition"
+                          >
+                            <Kanban className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Board
+                          </span>
+                        </div>
+
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => openEntityChat("dept-swarms")}
+                            className="p-1.5 text-purple-400 hover:text-white bg-purple-950/40 border border-purple-900/60 rounded-lg transition"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Chat
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -736,24 +857,66 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2 border-t border-slate-800 mt-2">
+                    <div className="flex justify-between items-center pt-2 border-t border-slate-800 mt-2" onClick={(e) => e.stopPropagation()}>
                       <span className="inline-block px-2.5 py-0.5 bg-slate-900 text-xs font-mono text-amber-400 rounded-lg border border-amber-500/20">
                         {tr.members}
                       </span>
 
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => openEntityBoard("master")}
-                          className="px-2.5 py-1 bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/30 text-cyan-300 rounded-xl text-xs font-semibold transition flex items-center gap-1"
-                        >
-                          <Kanban className="w-3 h-3" /> Board
-                        </button>
-                        <button
-                          onClick={() => openEntityChat("general")}
-                          className="px-2.5 py-1 bg-purple-950/60 hover:bg-purple-900 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-semibold transition flex items-center gap-1"
-                        >
-                          <MessageSquare className="w-3 h-3" /> Chat
-                        </button>
+                      <div className="flex items-center space-x-1.5">
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => {
+                              setEditingEntityId(tr.id);
+                              setTroopName(tr.name);
+                              setTroopLead(tr.lead || "");
+                              setTroopBudget((tr.budget || 0).toString());
+                              setTroopStatus(tr.status || "Active");
+                              setShowTroopModal(true);
+                            }}
+                            className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Edit
+                          </span>
+                        </div>
+
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => openLinkModal(tr.id, "troop", tr.name)}
+                            className="p-1.5 text-indigo-400 hover:text-white bg-indigo-950/40 border border-indigo-900/60 rounded-lg transition"
+                          >
+                            <Link2 className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Link
+                          </span>
+                        </div>
+
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => openEntityBoard("master")}
+                            className="p-1.5 text-cyan-400 hover:text-white bg-cyan-950/40 border border-cyan-900/60 rounded-lg transition"
+                          >
+                            <Kanban className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Board
+                          </span>
+                        </div>
+
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => openEntityChat("general")}
+                            className="p-1.5 text-purple-400 hover:text-white bg-purple-950/40 border border-purple-900/60 rounded-lg transition"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Chat
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -785,30 +948,63 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingEntityId(h.id);
-                          const names = h.name.split(" ");
-                          setHFirstName(names[0]);
-                          setHLastName(names.slice(1).join(" "));
-                          setHRole(h.role || "");
-                          setHSalary((h.annualSalary || 0).toString());
-                          setHStatus(h.status || "Active");
-                          setShowHumanModal(true);
-                        }}
-                        className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg"
-                        title="Edit Human"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); openLinkModal(h.id, "human", h.name); }}
-                        className="px-3 py-1.5 bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
-                      >
-                        <Link2 className="w-3.5 h-3.5" /> Link
-                      </button>
+                    <div className="flex items-center space-x-1.5" onClick={(e) => e.stopPropagation()}>
+                      <div className="relative group/tooltip">
+                        <button
+                          onClick={() => {
+                            setEditingEntityId(h.id);
+                            const names = h.name.split(" ");
+                            setHFirstName(names[0]);
+                            setHLastName(names.slice(1).join(" "));
+                            setHRole(h.role || "");
+                            setHSalary((h.annualSalary || 0).toString());
+                            setHStatus(h.status || "Active");
+                            setShowHumanModal(true);
+                          }}
+                          className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                          Edit
+                        </span>
+                      </div>
+
+                      <div className="relative group/tooltip">
+                        <button
+                          onClick={() => openLinkModal(h.id, "human", h.name)}
+                          className="p-1.5 text-indigo-400 hover:text-white bg-indigo-950/40 border border-indigo-900/60 rounded-lg transition"
+                        >
+                          <Link2 className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                          Link
+                        </span>
+                      </div>
+
+                      <div className="relative group/tooltip">
+                        <button
+                          onClick={() => openEntityBoard("master")}
+                          className="p-1.5 text-cyan-400 hover:text-white bg-cyan-950/40 border border-cyan-900/60 rounded-lg transition"
+                        >
+                          <Kanban className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                          Board
+                        </span>
+                      </div>
+
+                      <div className="relative group/tooltip">
+                        <button
+                          onClick={() => openEntityChat("general")}
+                          className="p-1.5 text-purple-400 hover:text-white bg-purple-950/40 border border-purple-900/60 rounded-lg transition"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                          Chat
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -839,28 +1035,61 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingEntityId(a.id);
-                          setAName(a.name);
-                          setARole(a.role || "");
-                          setACost((a.monthlyCost || 0).toString());
-                          setAStatus(a.status || "Active");
-                          setShowAgentModal(true);
-                        }}
-                        className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg"
-                        title="Edit Agent"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); openLinkModal(a.id, "agent", a.name); }}
-                        className="px-3 py-1.5 bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
-                      >
-                        <Link2 className="w-3.5 h-3.5" /> Link
-                      </button>
+                    <div className="flex items-center space-x-1.5" onClick={(e) => e.stopPropagation()}>
+                      <div className="relative group/tooltip">
+                        <button
+                          onClick={() => {
+                            setEditingEntityId(a.id);
+                            setAName(a.name);
+                            setARole(a.role || "");
+                            setACost((a.monthlyCost || 0).toString());
+                            setAStatus(a.status || "Active");
+                            setShowAgentModal(true);
+                          }}
+                          className="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                          Edit
+                        </span>
+                      </div>
+
+                      <div className="relative group/tooltip">
+                        <button
+                          onClick={() => openLinkModal(a.id, "agent", a.name)}
+                          className="p-1.5 text-indigo-400 hover:text-white bg-indigo-950/40 border border-indigo-900/60 rounded-lg transition"
+                        >
+                          <Link2 className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                          Link
+                        </span>
+                      </div>
+
+                      <div className="relative group/tooltip">
+                        <button
+                          onClick={() => openEntityBoard("ai_swarm")}
+                          className="p-1.5 text-cyan-400 hover:text-white bg-cyan-950/40 border border-cyan-900/60 rounded-lg transition"
+                        >
+                          <Kanban className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                          Board
+                        </span>
+                      </div>
+
+                      <div className="relative group/tooltip">
+                        <button
+                          onClick={() => openEntityChat("dept-swarms")}
+                          className="p-1.5 text-purple-400 hover:text-white bg-purple-950/40 border border-purple-900/60 rounded-lg transition"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[9px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                          Chat
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}

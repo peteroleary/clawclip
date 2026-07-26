@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Wallet, DollarSign, TrendingUp, TrendingDown, CreditCard, ArrowUpRight, ArrowDownRight, Plus, Receipt, Landmark, Activity, Target } from "lucide-react";
+import { Wallet, DollarSign, TrendingUp, TrendingDown, CreditCard, ArrowUpRight, ArrowDownRight, Plus, Receipt, Landmark, Activity, Target, Lock, Unlock, Trash2, Link2Off, X } from "lucide-react";
 import { ImmersiveScreenWrapper } from "../components/ImmersiveScreenWrapper.js";
 
 export interface FinancialMetric {
@@ -170,50 +170,20 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
     setShowACHModal(false);
   };
 
-  const headerActions = (
-    <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-semibold space-x-1">
-      <button
-        onClick={() => setActiveTab("dashboard")}
-        className={`px-3 py-1.5 rounded-lg transition ${
-          activeTab === "dashboard" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
-        }`}
-      >
-        Dashboard
-      </button>
-      <button
-        onClick={() => setActiveTab("ledger")}
-        className={`px-3 py-1.5 rounded-lg transition ${
-          activeTab === "ledger" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
-        }`}
-      >
-        Ledger
-      </button>
-      <button
-        onClick={() => setActiveTab("cards")}
-        className={`px-3 py-1.5 rounded-lg transition ${
-          activeTab === "cards" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
-        }`}
-      >
-        Cards ({cards.length})
-      </button>
-      <button
-        onClick={() => setActiveTab("crypto")}
-        className={`px-3 py-1.5 rounded-lg transition ${
-          activeTab === "crypto" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
-        }`}
-      >
-        Crypto ({cryptoWallets.length})
-      </button>
-      <button
-        onClick={() => setActiveTab("ach")}
-        className={`px-3 py-1.5 rounded-lg transition ${
-          activeTab === "ach" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
-        }`}
-      >
-        ACH ({achAccounts.length})
-      </button>
-    </div>
-  );
+  const getTabAction = () => {
+    switch (activeTab) {
+      case "cards":
+        return { label: "Add Card", action: () => setShowCardModal(true) };
+      case "crypto":
+        return { label: "Link Wallet", action: () => setShowCryptoModal(true) };
+      case "ach":
+        return { label: "Add ACH Account", action: () => setShowACHModal(true) };
+      default:
+        return null;
+    }
+  };
+
+  const tabAction = getTabAction();
 
   return (
     <ImmersiveScreenWrapper
@@ -224,11 +194,36 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
       icon={Wallet}
       iconColorClass="text-amber-400"
       iconBgClass="bg-amber-500/10 border-amber-500/30"
-      headerActions={headerActions}
       closeOnEsc={!showCardModal && !showCryptoModal && !showACHModal}
+      showHeader={false}
     >
       {/* Content Body */}
       <div className="flex-1 p-6 overflow-y-auto">
+        <div className="max-w-5xl mx-auto mb-6 flex flex-wrap gap-4 justify-between items-center pb-3 border-b border-slate-800/80">
+          {/* Left side: Tabs */}
+          <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-semibold space-x-1 shrink-0">
+            <button onClick={() => setActiveTab("dashboard")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "dashboard" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>Dashboard</button>
+            <button onClick={() => setActiveTab("ledger")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "ledger" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>Ledger</button>
+            <button onClick={() => setActiveTab("cards")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "cards" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>Cards ({cards.length})</button>
+            <button onClick={() => setActiveTab("crypto")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "crypto" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>Crypto ({cryptoWallets.length})</button>
+            <button onClick={() => setActiveTab("ach")} className={`px-3 py-1.5 rounded-lg transition ${activeTab === "ach" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"}`}>ACH ({achAccounts.length})</button>
+          </div>
+
+          {/* Right side: Dynamic Action Button */}
+          {tabAction && (
+            <div className="relative group">
+              <button
+                onClick={tabAction.action}
+                className="p-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl transition shadow-lg flex items-center justify-center"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 text-slate-200 text-[10px] font-medium px-2 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-50">
+                {tabAction.label}
+              </span>
+            </div>
+          )}
+        </div>
           {activeTab === "dashboard" && (
             <div className="space-y-8 max-w-5xl mx-auto">
               
@@ -342,22 +337,44 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
 
           {activeTab === "cards" && (
             <div className="space-y-4 max-w-4xl mx-auto">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="font-bold text-slate-200 text-sm">Payment Cards</h3>
-                <button
-                  onClick={() => setShowCardModal(true)}
-                  className="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-amber-950/50"
-                >
-                  <Plus className="w-4 h-4" /> + Add New Card
-                </button>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
                 {cards.map((card) => (
                   <div key={card.id} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3 hover:border-amber-500/40 transition">
                     <div className="flex justify-between items-center">
                       <CreditCard className="w-6 h-6 text-amber-400" />
-                      <span className="text-xs font-bold text-emerald-400">{card.status}</span>
+                      <div className="flex items-center space-x-1.5">
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border font-mono ${card.status === "Active" ? "text-emerald-400 bg-emerald-950/20 border-emerald-500/20" : "text-amber-400 bg-amber-950/20 border-amber-500/20"}`}>
+                          {card.status}
+                        </span>
+                        
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => {
+                              setCards(cards.map(c => c.id === card.id ? { ...c, status: c.status === "Active" ? "Frozen" : "Active" } : c));
+                            }}
+                            className="p-1 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded transition"
+                          >
+                            {card.status === "Active" ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[8px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            {card.status === "Active" ? "Freeze" : "Activate"}
+                          </span>
+                        </div>
+
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => {
+                              setCards(cards.filter(c => c.id !== card.id));
+                            }}
+                            className="p-1 text-rose-450 hover:text-rose-450 hover:bg-rose-950/20 bg-slate-900 border border-slate-800 rounded transition"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[8px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Delete
+                          </span>
+                        </div>
+                      </div>
                     </div>
                     <div>
                       <h4 className="font-bold text-white text-base">{card.name}</h4>
@@ -372,21 +389,29 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
 
           {activeTab === "crypto" && (
             <div className="space-y-4 max-w-4xl mx-auto">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="font-bold text-slate-200 text-sm">Linked Crypto Wallets</h3>
-                <button
-                  onClick={() => setShowCryptoModal(true)}
-                  className="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-amber-950/50"
-                >
-                  <Plus className="w-4 h-4" /> + Link Wallet
-                </button>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
                 {cryptoWallets.map((w) => (
-                  <div key={w.id} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-2 hover:border-amber-500/40 transition">
-                    <h4 className="font-bold text-white text-base">{w.name}</h4>
-                    <p className="text-xs text-amber-400 font-mono">{w.net} • {w.addr}</p>
+                  <div key={w.id} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3 hover:border-amber-500/40 transition">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-bold text-white text-base">{w.name}</h4>
+                        <p className="text-xs text-amber-400 font-mono mt-0.5">{w.net} • {w.addr}</p>
+                      </div>
+                      
+                      <div className="relative group/tooltip shrink-0">
+                        <button
+                          onClick={() => {
+                            setCryptoWallets(cryptoWallets.filter(cw => cw.id !== w.id));
+                          }}
+                          className="p-1.5 text-rose-450 hover:text-rose-450 hover:bg-rose-950/20 bg-slate-900 border border-slate-800 rounded transition"
+                        >
+                          <Link2Off className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[8px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                          Unlink
+                        </span>
+                      </div>
+                    </div>
                     <span className="text-xs font-bold text-emerald-400 block font-mono">{w.balance}</span>
                   </div>
                 ))}
@@ -396,22 +421,28 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
 
           {activeTab === "ach" && (
             <div className="space-y-4 max-w-4xl mx-auto">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <h3 className="font-bold text-slate-200 text-sm">Linked ACH Bank Accounts</h3>
-                <button
-                  onClick={() => setShowACHModal(true)}
-                  className="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-amber-950/50"
-                >
-                  <Plus className="w-4 h-4" /> + Add ACH Account
-                </button>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
                 {achAccounts.map((a) => (
-                  <div key={a.id} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-2 hover:border-amber-500/40 transition">
+                  <div key={a.id} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3 hover:border-amber-500/40 transition">
                     <div className="flex justify-between items-center">
                       <Landmark className="w-5 h-5 text-amber-400" />
-                      <span className="text-xs text-emerald-400 font-semibold">{a.status}</span>
+                      <div className="flex items-center space-x-1.5">
+                        <span className="text-[10px] text-emerald-400 font-semibold px-1.5 py-0.5 bg-emerald-950/20 border border-emerald-500/20 rounded-md">{a.status}</span>
+                        
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => {
+                              setAchAccounts(achAccounts.filter(ach => ach.id !== a.id));
+                            }}
+                            className="p-1 text-rose-450 hover:text-rose-450 hover:bg-rose-950/20 bg-slate-900 border border-slate-800 rounded transition"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 text-slate-200 text-[8px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                            Delete
+                          </span>
+                        </div>
+                      </div>
                     </div>
                     <h4 className="font-bold text-white text-base">{a.name}</h4>
                     <p className="text-xs text-slate-400 font-mono">{a.bank} • Account ending in {a.last4}</p>

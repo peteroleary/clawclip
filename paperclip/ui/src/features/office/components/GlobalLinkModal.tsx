@@ -21,7 +21,7 @@ export const GlobalLinkModal: React.FC = () => {
       setError(null);
       
       const fetchNodes = async () => {
-        const { data, err } = await supabase.from('nodes').select('*');
+        const { data, error: err } = await supabase.from('nodes').select('*');
         if (err) {
           console.error("Failed to load nodes", err);
         } else {
