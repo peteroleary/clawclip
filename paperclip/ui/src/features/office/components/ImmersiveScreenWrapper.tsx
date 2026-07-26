@@ -104,7 +104,7 @@ export const ImmersiveScreenWrapper: React.FC<ImmersiveScreenWrapperProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-hidden flex flex-col">
+        <div className="flex-1 overflow-hidden flex flex-col pb-20">
           {children}
         </div>
       </div>

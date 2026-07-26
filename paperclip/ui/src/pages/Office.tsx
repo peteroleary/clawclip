@@ -137,19 +137,19 @@ export const OfficePage: React.FC = () => {
 
       {/* Floating Bottom Action Dock: Wallet | Team, Targets, Projects, Board, Scheduling, Facilities, Directory, Memory, Artifacts | Comms */}
       <BottomActionDock
-        onOpenExample={() => setActiveDrawer("bottom", "example")}
-        onOpenWallet={() => setActiveDrawer("bottom", "wallet")}
-        onOpenTeam={() => setActiveDrawer("bottom", "team")}
-        onOpenTargets={() => setActiveDrawer("bottom", "targets")}
-        onOpenProjects={() => setActiveDrawer("bottom", "projects")}
-        onOpenBoard={() => setActiveDrawer("bottom", "board")}
-        onOpenScheduling={() => setActiveDrawer("bottom", "scheduling")}
-        onOpenFacilities={() => setActiveDrawer("bottom", "facilities")}
-        onOpenDiscover={() => setActiveDrawer("bottom", "discover")}
-        onOpenDirectory={() => setActiveDrawer("bottom", "directory")}
-        onOpenMemory={() => setActiveDrawer("bottom", "memory")}
-        onOpenArtifacts={() => setActiveDrawer("bottom", "artifacts")}
-        onOpenComms={() => setActiveDrawer("bottom", "comms")}
+        onOpenExample={() => setActiveDrawer("bottom", activePanels.bottom === "example" ? null : "example")}
+        onOpenWallet={() => setActiveDrawer("bottom", activePanels.bottom === "wallet" ? null : "wallet")}
+        onOpenTeam={() => setActiveDrawer("bottom", activePanels.bottom === "team" ? null : "team")}
+        onOpenTargets={() => setActiveDrawer("bottom", activePanels.bottom === "targets" ? null : "targets")}
+        onOpenProjects={() => setActiveDrawer("bottom", activePanels.bottom === "projects" ? null : "projects")}
+        onOpenBoard={() => setActiveDrawer("bottom", activePanels.bottom === "board" ? null : "board")}
+        onOpenScheduling={() => setActiveDrawer("bottom", activePanels.bottom === "scheduling" ? null : "scheduling")}
+        onOpenFacilities={() => setActiveDrawer("bottom", activePanels.bottom === "facilities" ? null : "facilities")}
+        onOpenDiscover={() => setActiveDrawer("bottom", activePanels.bottom === "discover" ? null : "discover")}
+        onOpenDirectory={() => setActiveDrawer("bottom", activePanels.bottom === "directory" ? null : "directory")}
+        onOpenMemory={() => setActiveDrawer("bottom", activePanels.bottom === "memory" ? null : "memory")}
+        onOpenArtifacts={() => setActiveDrawer("bottom", activePanels.bottom === "artifacts" ? null : "artifacts")}
+        onOpenComms={() => setActiveDrawer("bottom", activePanels.bottom === "comms" ? null : "comms")}
       />
 
       {/* 1. Full-Screen Immersive Wallet & Treasury Screen */}

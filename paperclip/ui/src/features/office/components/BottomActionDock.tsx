@@ -67,7 +67,7 @@ export const BottomActionDock: React.FC<BottomActionDockProps> = ({
   ];
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 select-none flex items-center">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-60 select-none flex items-center">
       {/* Main Floating Dock Bar */}
       <div className="flex items-center space-x-1 bg-[#06090d]/90 backdrop-blur-xl border border-slate-800/80 p-2 rounded-2xl shadow-2xl shadow-cyan-950/40">
         {mainDockItems.map((item) => {

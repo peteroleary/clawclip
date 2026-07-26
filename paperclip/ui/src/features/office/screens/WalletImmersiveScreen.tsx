@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { X, Wallet, DollarSign, TrendingUp, TrendingDown, CreditCard, ArrowUpRight, ArrowDownRight, Plus, Receipt, Landmark, ShieldCheck, Activity, Target } from "lucide-react";
+import { Wallet, DollarSign, TrendingUp, TrendingDown, CreditCard, ArrowUpRight, ArrowDownRight, Plus, Receipt, Landmark, Activity, Target } from "lucide-react";
+import { ImmersiveScreenWrapper } from "../components/ImmersiveScreenWrapper.js";
 
 export interface FinancialMetric {
   id: string;
@@ -53,20 +54,30 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
   const [achRouting, setAchRouting] = useState("");
   const [achAccount, setAchAccount] = useState("");
 
-  // Items Collections State
+  // Lists mock state
   const [cards, setCards] = useState([
-    { id: "c1", name: "Corporate Debit Card", brand: "Visa", last4: "4242", exp: "12/28", status: "Primary" },
+    { id: "c1", name: "Alex Mercer", brand: "Visa", last4: "4242", exp: "12/28", status: "Active", limit: 5000, spent: 1200 },
+    { id: "c2", name: "OpenClaw Coder", brand: "Mastercard", last4: "8821", exp: "06/29", status: "Active", limit: 2000, spent: 850 },
+    { id: "c3", name: "Hermes Manager", brand: "Visa", last4: "1092", exp: "11/27", status: "Active", limit: 1000, spent: 120 },
   ]);
 
   const [cryptoWallets, setCryptoWallets] = useState([
-    { id: "w1", name: "Treasury Multisig Vault", net: "Ethereum Mainnet", addr: "0x71C...3a91", balance: "4.5 ETH" },
+    { id: "w1", name: "Treasury Multisig", net: "Ethereum Mainnet", addr: "0x71C...3921", balance: "42.85 ETH" },
+    { id: "w2", name: "Agent Gas Fund", net: "Arbitrum One", addr: "0x12a...99b2", balance: "1.45 ETH" },
   ]);
 
   const [achAccounts, setAchAccounts] = useState([
-    { id: "a1", name: "Silicon Valley Bank Checking", bank: "SVB", last4: "8821", routing: "121000358", status: "Verified" },
+    { id: "a1", name: "Paperclip AI Inc", bank: "Silicon Valley Bank", last4: "9901", routing: "021000021", status: "Verified" },
   ]);
 
-  // Financial Dashboard Mock Data
+  const [budgets] = useState([
+    { id: "b1", tag: "#engineering", allocated: 50000, spent: 42000, provider: "ramp", externalId: "bgt_1928" },
+    { id: "b2", tag: "#marketing", allocated: 20000, spent: 18500, provider: "stripe", externalId: "bgt_4210" },
+    { id: "b3", tag: "#project-clawclip", allocated: 15000, spent: 16500, provider: "ramp", externalId: "bgt_1092" },
+    { id: "b4", tag: "#ai-swarms", allocated: 5000, spent: 1200, provider: "internal", externalId: "bgt_local" },
+    { id: "b5", tag: "#sales", allocated: 25000, spent: 8000, provider: "brex", externalId: "bgt_8821" },
+  ]);
+
   const [metrics] = useState<FinancialMetric[]>([
     { id: "m1", label: "Monthly Recurring Revenue", value: 125000, format: "currency", trend: 12.5, trendLabel: "vs last month", icon: <TrendingUp className="w-5 h-5 text-emerald-400" /> },
     { id: "m2", label: "Total Expenses (MTD)", value: 85400, format: "currency", trend: -2.4, trendLabel: "vs last month", icon: <TrendingDown className="w-5 h-5 text-rose-400" /> },
@@ -74,14 +85,6 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
     { id: "m4", label: "Current Runway", value: 18, format: "months", trend: 0, trendLabel: "stable", icon: <Activity className="w-5 h-5 text-cyan-400" /> },
     { id: "m5", label: "Monthly Burn Rate", value: 45000, format: "currency", trend: 5.2, trendLabel: "vs last month", icon: <Landmark className="w-5 h-5 text-amber-400" /> },
     { id: "m6", label: "Customer Acquisition Cost", value: 450, format: "currency", trend: -15.0, trendLabel: "vs last month", icon: <Target className="w-5 h-5 text-purple-400" /> },
-  ]);
-
-  const [tagBudgets] = useState<TagBudget[]>([
-    { id: "b1", tag: "#engineering", allocated: 50000, spent: 42000, provider: "ramp", externalId: "bgt_1928" },
-    { id: "b2", tag: "#marketing", allocated: 20000, spent: 18500, provider: "stripe", externalId: "bgt_4210" },
-    { id: "b3", tag: "#project-clawclip", allocated: 15000, spent: 16500, provider: "ramp", externalId: "bgt_1092" },
-    { id: "b4", tag: "#ai-swarms", allocated: 5000, spent: 1200, provider: "internal", externalId: "bgt_local" },
-    { id: "b5", tag: "#sales", allocated: 25000, spent: 8000, provider: "brex", externalId: "bgt_8821" },
   ]);
 
   const [ledger] = useState([
@@ -97,14 +100,11 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
         if (showCardModal) setShowCardModal(false);
         else if (showCryptoModal) setShowCryptoModal(false);
         else if (showACHModal) setShowACHModal(false);
-        else onClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, showCardModal, showCryptoModal, showACHModal, onClose]);
-
-  if (!isOpen) return null;
+  }, [isOpen, showCardModal, showCryptoModal, showACHModal]);
 
   const handleAddCard = (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,6 +118,8 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
         last4: cardNumber.slice(-4) || "9912",
         exp: cardExp || "08/29",
         status: "Active",
+        limit: 5000,
+        spent: 0,
       },
       ...cards,
     ]);
@@ -168,78 +170,65 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
     setShowACHModal(false);
   };
 
+  const headerActions = (
+    <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-semibold space-x-1">
+      <button
+        onClick={() => setActiveTab("dashboard")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "dashboard" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        Dashboard
+      </button>
+      <button
+        onClick={() => setActiveTab("ledger")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "ledger" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        Ledger
+      </button>
+      <button
+        onClick={() => setActiveTab("cards")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "cards" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        Cards ({cards.length})
+      </button>
+      <button
+        onClick={() => setActiveTab("crypto")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "crypto" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        Crypto ({cryptoWallets.length})
+      </button>
+      <button
+        onClick={() => setActiveTab("ach")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "ach" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        ACH ({achAccounts.length})
+      </button>
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col p-4 md:p-6 overflow-hidden">
-      <div className="bg-[#090d16] border border-slate-800 rounded-2xl w-full h-full shadow-2xl text-slate-100 flex flex-col relative overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#06090d] border-b border-slate-800 shrink-0">
-          <div className="flex items-center space-x-4">
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
-              <Wallet className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">ATM Treasury & Financial Ledger</h2>
-              <p className="text-xs text-slate-400">Company budget allocations, payment cards, crypto wallets, and ACH banking</p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            {/* Tabs */}
-            <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-semibold space-x-1">
-              <button
-                onClick={() => setActiveTab("dashboard")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "dashboard" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Dashboard
-              </button>
-              <button
-                onClick={() => setActiveTab("ledger")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "ledger" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Ledger
-              </button>
-              <button
-                onClick={() => setActiveTab("cards")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "cards" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Cards ({cards.length})
-              </button>
-              <button
-                onClick={() => setActiveTab("crypto")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "crypto" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Crypto Wallets ({cryptoWallets.length})
-              </button>
-              <button
-                onClick={() => setActiveTab("ach")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "ach" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                ACH Banking ({achAccounts.length})
-              </button>
-            </div>
-
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition"
-              title="Close (ESC)"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Content Body */}
-        <div className="flex-1 p-6 overflow-y-auto">
+    <ImmersiveScreenWrapper
+      isOpen={isOpen}
+      onClose={onClose}
+      title="ATM Treasury & Financial Ledger"
+      subtitle="Company budget allocations, payment cards, crypto wallets, and ACH banking"
+      icon={Wallet}
+      iconColorClass="text-amber-400"
+      iconBgClass="bg-amber-500/10 border-amber-500/30"
+      headerActions={headerActions}
+      closeOnEsc={!showCardModal && !showCryptoModal && !showACHModal}
+    >
+      {/* Content Body */}
+      <div className="flex-1 p-6 overflow-y-auto">
           {activeTab === "dashboard" && (
             <div className="space-y-8 max-w-5xl mx-auto">
               
@@ -648,6 +637,6 @@ export const WalletImmersiveScreen: React.FC<WalletImmersiveScreenProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </ImmersiveScreenWrapper>
   );
 };
