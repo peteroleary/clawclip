@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, Users, User, Bot, Network, Layers, ShieldCheck, Plus, Move, DollarSign, Mail, Phone, Clock, Shield, Kanban, MessageSquare, Link2, Edit2, Target, Folder, CheckSquare, Zap, FileText } from "lucide-react";
 import type { Workforce3DMember } from "../types.js";
 import { useOfficeStore } from "../../../store/officeStore.js";
+import { ImmersiveScreenWrapper } from "../components/ImmersiveScreenWrapper.js";
 
 interface TeamImmersiveScreenProps {
   isOpen: boolean;
@@ -186,7 +187,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
         else if (showSwarmModal) setShowSwarmModal(false);
         else if (showTroopModal) setShowTroopModal(false);
         else if (showOrgLinkModal) setShowOrgLinkModal(false);
-        else onClose();
+        else if (selectedEntity) setSelectedEntity(null);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -200,7 +201,7 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
     showSwarmModal,
     showTroopModal,
     showOrgLinkModal,
-    onClose,
+    selectedEntity,
   ]);
 
   if (!isOpen) return null;
@@ -374,95 +375,83 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
   };
 
   const tabHeader = getTabHeader();
+  const hasOpenModal = showHumanModal || showAgentModal || showDeptModal || showTeamModal || showSwarmModal || showTroopModal || showOrgLinkModal || selectedEntity !== null;
+
+  const headerActions = (
+    <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-semibold space-x-1">
+      <button
+        onClick={() => setActiveTab("org")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "org" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        Org
+      </button>
+      <button
+        onClick={() => setActiveTab("departments")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "departments" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        Departments
+      </button>
+      <button
+        onClick={() => setActiveTab("humans")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "humans" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        Humans
+      </button>
+      <button
+        onClick={() => setActiveTab("agents")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "agents" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        Agents
+      </button>
+      <button
+        onClick={() => setActiveTab("teams")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "teams" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        Teams
+      </button>
+      <button
+        onClick={() => setActiveTab("swarms")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "swarms" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        Swarms
+      </button>
+      <button
+        onClick={() => setActiveTab("troops")}
+        className={`px-3 py-1.5 rounded-lg transition ${
+          activeTab === "troops" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
+        }`}
+      >
+        Troops
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col p-4 md:p-6 overflow-hidden">
-      <div className="bg-[#090d16] border border-slate-800 rounded-2xl w-full h-full shadow-2xl text-slate-100 flex flex-col relative overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#06090d] border-b border-slate-800 shrink-0">
-          <div className="flex items-center space-x-4">
-            <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400">
-              <Users className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">Team & Personnel Headquarters</h2>
-              <p className="text-xs text-slate-400">Manage company organization, departments, swarms, troops, human staff, and AI agents</p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            {/* Tabs */}
-            <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-semibold space-x-1">
-              <button
-                onClick={() => setActiveTab("org")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "org" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Org
-              </button>
-              <button
-                onClick={() => setActiveTab("departments")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "departments" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Departments
-              </button>
-              <button
-                onClick={() => setActiveTab("humans")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "humans" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Humans
-              </button>
-              <button
-                onClick={() => setActiveTab("agents")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "agents" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Agents
-              </button>
-              <button
-                onClick={() => setActiveTab("teams")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "teams" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Teams
-              </button>
-              <button
-                onClick={() => setActiveTab("swarms")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "swarms" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Swarms
-              </button>
-              <button
-                onClick={() => setActiveTab("troops")}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  activeTab === "troops" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Troops
-              </button>
-            </div>
-
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition"
-              title="Close (ESC)"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Content Body */}
-        <div className="flex-1 p-6 overflow-y-auto">
+    <ImmersiveScreenWrapper
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Team & Personnel Headquarters"
+      subtitle="Manage company organization, departments, swarms, troops, human staff, and AI agents"
+      icon={Users}
+      iconColorClass="text-purple-400"
+      iconBgClass="bg-purple-500/10 border-purple-500/30"
+      headerActions={headerActions}
+      closeOnEsc={!hasOpenModal}
+    >
+      {/* Content Body */}
+      <div className="flex-1 p-6 overflow-y-auto">
           {tabHeader && (
             <div className="max-w-5xl mx-auto mb-6 flex justify-between items-center pb-2 border-b border-slate-800">
               <div className="text-left">
@@ -1500,12 +1489,10 @@ export const TeamImmersiveScreen: React.FC<TeamImmersiveScreenProps> = ({
                     </ul>
                   </div>
                 )}
-
               </div>
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </ImmersiveScreenWrapper>
   );
 };

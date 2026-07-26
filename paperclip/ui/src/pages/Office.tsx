@@ -25,6 +25,7 @@ import { TargetsImmersiveScreen } from "../features/office/screens/TargetsImmers
 import { DirectoryImmersiveScreen } from "../features/office/screens/DirectoryImmersiveScreen.js";
 import { FacilitiesImmersiveScreen } from "../features/office/screens/FacilitiesImmersiveScreen.js";
 import { GlobalLinkModal } from "../features/office/components/GlobalLinkModal.js";
+import { GithubImmersiveScreen } from "../features/office/screens/GithubImmersiveScreen.js";
 
 export const OfficePage: React.FC = () => {
   const { companyId } = useParams<{ companyId: string }>();
@@ -136,6 +137,7 @@ export const OfficePage: React.FC = () => {
 
       {/* Floating Bottom Action Dock: Wallet | Team, Targets, Projects, Board, Scheduling, Facilities, Directory, Memory, Artifacts | Comms */}
       <BottomActionDock
+        onOpenExample={() => setActiveDrawer("bottom", "example")}
         onOpenWallet={() => setActiveDrawer("bottom", "wallet")}
         onOpenTeam={() => setActiveDrawer("bottom", "team")}
         onOpenTargets={() => setActiveDrawer("bottom", "targets")}
@@ -153,6 +155,12 @@ export const OfficePage: React.FC = () => {
       {/* 1. Full-Screen Immersive Wallet & Treasury Screen */}
       <WalletImmersiveScreen
         isOpen={activePanels.bottom === "wallet"}
+        onClose={() => setActiveDrawer("bottom", null)}
+      />
+
+      {/* 1.5 Example / Github Immersive Screen */}
+      <GithubImmersiveScreen
+        isOpen={activePanels.bottom === "example"}
         onClose={() => setActiveDrawer("bottom", null)}
       />
 
